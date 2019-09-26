@@ -295,11 +295,11 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 
 	# create a backup of the pem key files in $BACKUP_ALLKEYS_FOLDER/$key_id
 	mkdir -p "$BACKUP_ALLKEYS_FOLDER/$key_id"
-	cp -n initial{Nodes,Balances}Sk.pem "$BACKUP_ALLKEYS_FOLDER/$key_id"
+	cp initial{Nodes,Balances}Sk.pem "$BACKUP_ALLKEYS_FOLDER/$key_id"
 
 	default_new_node_folder="$NODE_FOLDER_PREFIX$key_id"  # default node folder for $key_id
 	mkdir -p $default_new_node_folder/config
-	cp -n initial{Nodes,Balances}Sk.pem $default_new_node_folder/config
+	cp initial{Nodes,Balances}Sk.pem $default_new_node_folder/config
 
 	# appending new node identities to settings
 	use_keys_string_new="${use_keys_string_new} $key_id"
@@ -309,7 +309,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 
 	# copy fresh elrond-config to the node config folder
 	# and insert friendly node names in config.toml
-	cp -n $SOURCE_ELRONDCONFIG_FOLDER/*.* $default_new_node_folder/config
+	cp $SOURCE_ELRONDCONFIG_FOLDER/*.* $default_new_node_folder/config
 	i=$((number_of_existing_nodes + new_node))
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
 	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' $default_new_node_folder/config/config.toml
