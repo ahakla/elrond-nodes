@@ -18,8 +18,7 @@ SOURCE_ELRONDGO_FOLDER="$ELROND_FOLDER/elrond-go"
 NODE_FOLDER_PREFIX="$ELROND_FOLDER/elrond-go-node-"  # this will be followed by $USE_KEYS[i]
 
 # other settings
-TMUX_SESSION_PREFIX='node-'			# tmux sessions will be named `node-01` and so on
-SCREEN_SESSION_PREFIX=$TMUX_SESSION_PREFIX  #In case you prefer to use screen 
+SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01` and so on
 
 ##################################################################################
 ##                          EDIT BELOW WHERE NECESSARY                          ##
