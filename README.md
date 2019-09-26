@@ -12,5 +12,5 @@ Instructions for using this repository:
  * `cd elrond-nodes` - open the folder with the scripts
  * `nano nodes_config.sh` - customize the nodes setup
  * stop all nodes, if they are still running (for tmux you may want to use `tmux kill-server`)
- * `bash install_nodes.sh - (re-)install the Elrond node(s)
+ * `bash install_nodes.sh` - (re-)install the Elrond node(s)
  * `bash start_nodes_tmux.sh` to run all nodes that were specified in `nodes_config.sh`
