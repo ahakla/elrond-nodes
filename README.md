@@ -16,7 +16,7 @@ and copy your `initialNodesSk.pem` and `initialBalancesSk.pem` there
  * `bash install_nodes.sh` - (re-)install the Elrond node(s)
  * `bash start_nodes_tmux.sh` to run all nodes that were specified in `nodes_config.sh`
 
-### Usage
+### Configuration of nodes_config.sh
 
 You can use this repo for different scenarios:
 
@@ -32,7 +32,7 @@ You can use this repo for different scenarios:
 
 ----------------------------------------------------------
 
-Here is how you could setup your `nodes_config.sh` in these scenario's:
+Here is how you could setup your `nodes_config.sh` in these scenario's, prior to running `install_nodes.sh`.
 
 1. Set `USE_KEYS=()`, `KEEPDB_KEYS=()`, `KEEPLOGS_KEYS=()`, `KEEPSTATS_KEYS=()`.
 
@@ -61,4 +61,4 @@ Also, `nodes_config.sh` will be automatically updated to the new configuration.
 ### Running the nodes
 
 You can choose to run all node instances using `tmux` or `screen` as a terminal multiplexer.
-Use the scripts `start_nodes_tmux.sh` and `start_nodes_screen.sh` for this, respectively.
+Use `bash start_nodes_tmux.sh` or `bash start_nodes_screen.sh` for this, respectively.
