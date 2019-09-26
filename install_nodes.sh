@@ -84,7 +84,7 @@ for i in "${!USE_KEYS[@]}"; do
 			# avoiding a cp `are the same file` error
 			mkdir -p ${default_node_folder[i]}/config
 			if [[ "$folder" != "${default_node_folder[i]}/config" ]]; then
-				cp -n $folder/initial{Nodes,Balances}Sk.pem ${default_node_folder[i]}/config
+				cp $folder/initial{Nodes,Balances}Sk.pem ${default_node_folder[i]}/config
 			fi
 
 			# now check if the pem key files reside in a node folder structure with any of the required folders
@@ -270,10 +270,10 @@ cd $SOURCE_ELRONDGO_FOLDER/cmd/keygenerator
 go build
 
 # prepare appending settings for the new nodes identities
-use_keys_string_old="${USE_KEYS[@]}"; use_keys_string_new=$use_keys_string_old
-keepdb_keys_string_old="${KEEPDB_KEYS[@]}"; keepdb_keys_string_new=$keepdb_keys_string_old
-keeplogs_keys_string_old="${KEEPLOGS_KEYS[@]}"; keeplogs_keys_string_new=$keeplogs_keys_string_old
-keepstats_keys_string_old="${KEEPSTATS_KEYS[@]}"; keepstats_keys_string_new=$keepstats_keys_string_old
+use_keys_string_new="${USE_KEYS[@]}"
+keepdb_keys_string_new="${KEEPDB_KEYS[@]}"
+keeplogs_keys_string_new="${KEEPLOGS_KEYS[@]}"
+keepstats_keys_string_new="${KEEPSTATS_KEYS[@]}"
 
 # create new pem key files for the remaining nodes and make a backup
 number_of_existing_nodes=${#USE_KEYS[@]}

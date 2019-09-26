@@ -26,9 +26,9 @@ TMUX_SESSION_PREFIX='node-'			# tmux sessions will be named `node-01` and so on
 
 # define the code versions to be used
 ELRONDGO_VER='tags/v1.0.17'		# see https://github.com/ElrondNetwork/elrond-go/releases/latest
-ELRONDGO_BRANCH='development'		# normally: 'master'
+ELRONDGO_BRANCH='development'		# default: 'master', could also by 'development', or another tag
 ELRONDCONFIG_VER='tags/testnet-1017'	# see https://github.com/ElrondNetwork/elrond-config/releases/latest
-ELRONDCONFIG_BRANCH='master'		# normally: 'master'
+ELRONDCONFIG_BRANCH='master'		# default: 'master', could also by 'development', or another tag
 
 # define where the backup pem key files for each node are (to be) stored
 # make sure the pem files for each node are stored in $BACKUP_ALL_KEYS_FOLDER/xxxxxxxxxxxx
@@ -50,4 +50,4 @@ USE_KEYS=(86001ab0d380 22a5a948582d)	# use these existing pem key files (first 1
 KEEPDB_KEYS=(yes yes)			# keep existing /db folders? (default: yes)
 KEEPLOGS_KEYS=(no no)			# keep existing /logs folders? (default: no)
 KEEPSTATS_KEYS=(no no)			# keep existing /stats folders? (default: no)
-CLEANUP=yes				# within $ELROND_FOLDER, remove all unused node folder structures?
+CLEANUP=no				# within $ELROND_FOLDER, remove all unused node folder structures?
