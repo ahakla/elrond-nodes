@@ -111,23 +111,27 @@ for i in "${!USE_KEYS[@]}"; do
 				# then copy the existing node subfolder(s) to $default_node_folder[i]
 
 				mainfolder_existing_node[i]="$(dirname $folder)"
-				echo -e "${GREEN}Found${NC} required node subfolders for initialNodesPk ${USE_KEYS[i]}... in ${mainfolder_existing_node[i]}."
+				echo -e -n "${GREEN}Found${NC} required node subfolders for initialNodesPk ${USE_KEYS[i]}... "
+				echo -e "in ${mainfolder_existing_node[i]}."
 
 				if [[ "${mainfolder_existing_node[i]}" != "${default_node_folder[i]}" ]]; then
 					# do not copy to self
-					echo -e "Moving required node subfolders from ${mainfolder_existing_node[i]} to ${default_node_folder[i]}."
+					echo -e -n "Moving required node subfolders from ${mainfolder_existing_node[i]} to "
+					echo "${default_node_folder[i]}."
 
 					# move the required data to the $default_node_folder[i] structure
 					# clean up if folders are not required, ask for confirmation before removing /db folder
 					if [[ "${KEEPDB_KEYS[i]^^}" != "NO" && -d "$use_keys_db" ]]; then
 						sudo mv -nu ${mainfolder_existing_node[i]}/db ${default_node_folder[i]}
 					elif [[ "${KEEPDB_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/db ]]; then
-						read -p "Are you sure you want to remove the /db folder for initialNodesPk ${USE_KEYS[i]}...? [y/n] : " are_you_sure
+						echo -n "Are you sure you want to remove the /db folder for initialNodesPk "
+						read -p "${USE_KEYS[i]}...? [y/n] : " are_you_sure
 						if [[ $are_you_sure == "y" ]]; then
 							echo "Removing the /db folder for initialNodesPk ${USE_KEYS[i]}..."
 							sudo rm -rf ${default_node_folder[i]}/db
 						else
-							echo "Despite the settings in nodes_config.sh, keeping the /db folder for initialNodesPk ${USE_KEYS[i]}..."
+							echo -n "Despite the settings in nodes_config.sh, keeping the /db "
+							echo "folder for initialNodesPk ${USE_KEYS[i]}..."
 						fi
 					fi
 					if [[ "${KEEPLOGS_KEYS[i]^^}" != "NO" && -d "$use_keys_logs" ]]; then
