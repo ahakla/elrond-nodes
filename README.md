@@ -6,7 +6,7 @@ This repository enables you to install/update one or multiple Elrond nodes on Ub
 
 Instructions for using this repository:
  * always have a safe backup for all your pem key files!
- * if you already have nodes, create a separate subfolder for each node identity in $HOME/elrond_backup_keys, and copy your initialNodesSk.pem and initialBalancesSk.pem there
+ * if you already have nodes, create a separate subfolder for each node identity in `$HOME/elrond_backup_keys`, and copy your `initialNodesSk.pem` and `initialBalancesSk.pem` there
 
  * `git clone git@github.com:ahakla/elrond-nodes.git` - clone this repository
  * `cd elrond-nodes` - open the folder with the scripts
