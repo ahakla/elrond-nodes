@@ -5,6 +5,14 @@
 # exit script immediately on error
 set -e
 
+# set $GOPATH if not set and export to ~/.profile along with Go binary path
+if [[ $GOPATH=="" ]]; then
+	GOPATH="$HOME/go"
+fi
+echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
+echo "export GOPATH=$GOPATH" >> ~/.profile
+source ~/.profile
+
 # source the general node config file, which should be in the same folder as the current script
 source ./nodes_config.sh
 scripts_folder=$PWD
@@ -36,6 +44,9 @@ while [[  $cust_answer != "y" && $cust_answer != "exit" ]] ; do
 		echo -e "${RED}Please answer \"y\" or \"exit\".${NC} Repeating the question."
 	fi
 done
+
+# create $ELROND_FOLDER and $BACKUP_ALLKEYS_FOLDER if they do not exist
+mkdir -p $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER
 
 # recursively search $ELROND_FOLDER and $BACKUP_ALL_KEYS_FOLDER for folders that contain
 # both pem key files and put them in a string of strings called $folders_with_keys,
@@ -217,12 +228,6 @@ if ! [ -x "$(command -v go)" ];
       echo -e "${GREEN}GO is already installed: ${CYAN}$VER${NC}${GREEN}...skipping install${NC}"
 
   fi
-
-# let's handle the paths
-echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
-mkdir -p "$HOME/go"
-echo "export GOPATH=$HOME/go" >> ~/.profile
-source ~/.profile
 
 # clean up old installations
 if [[ -d $SOURCE_ELRONDGO_FOLDER ]]; then
