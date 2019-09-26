@@ -237,7 +237,6 @@ if [[ -d $SOURCE_ELRONDCONFIG_FOLDER ]]; then
 	sudo rm -rf $SOURCE_ELRONDCONFIG_FOLDER
 fi
 
-mkdir -p $ELROND_FOLDER
 cd $ELROND_FOLDER
 
 #clone repos
