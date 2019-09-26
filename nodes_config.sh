@@ -12,6 +12,7 @@ GREEN='\x1B[0;32m'
 NC='\x1B[0m'
 
 # use default setup according to ElrondNetwork/elrond-go-scripts repository
+GOPATH="~/go"
 ELROND_FOLDER="$GOPATH/src/github.com/ElrondNetwork"
 SOURCE_ELRONDCONFIG_FOLDER="$ELROND_FOLDER/elrond-config"
 SOURCE_ELRONDGO_FOLDER="$ELROND_FOLDER/elrond-go"
