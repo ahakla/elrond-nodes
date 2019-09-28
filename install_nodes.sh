@@ -240,9 +240,6 @@ if ! [ -x "$(command -v go)" ];
   fi
 
 # clean up old installations
-if [[ -d "$ELROND_FOLDER/.git" ]]; then
-	sudo rm -rf "$ELROND_FOLDER/.git"
-fi
 if [[ -d $SOURCE_ELRONDGO_FOLDER ]]; then
 	sudo rm -rf $SOURCE_ELRONDGO_FOLDER
 fi
