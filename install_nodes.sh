@@ -240,6 +240,9 @@ if ! [ -x "$(command -v go)" ];
   fi
 
 # clean up old installations
+if [[ -d "$ELROND_FOLDER/.git" ]]; then
+	sudo rm -rf "$ELROND_FOLDER/.git"
+fi
 if [[ -d $SOURCE_ELRONDGO_FOLDER ]]; then
 	sudo rm -rf $SOURCE_ELRONDGO_FOLDER
 fi
@@ -249,18 +252,12 @@ fi
 
 cd $ELROND_FOLDER
 
-#Clone/update the elrond-go & elrond-config repos
+# clone the elrond-go & elrond-config repos
 git clone https://github.com/ElrondNetwork/elrond-go
-cd $SOURCE_ELRONDGO_FOLDER
-git fetch --all
-git reset --hard origin/master
-git checkout $ELRONDGO_BRANCH
+cd $SOURCE_ELRONDGO_FOLDER && git checkout --force $ELRONDGO_VER
 cd $ELROND_FOLDER
 git clone https://github.com/ElrondNetwork/elrond-config
-cd $SOURCE_ELRONDGO_FOLDER
-git fetch --all
-git reset --hard origin/master
-git checkout $ELRONDGO_BRANCH
+cd $SOURCE_ELRONDCONFIG_FOLDER && git checkout --force $ELRONDCONFIG_VER
 
 # copy fresh elrond-config to the node config folder
 # and insert friendly node names in config.toml

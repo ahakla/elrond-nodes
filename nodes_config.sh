@@ -26,9 +26,7 @@ SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01`
 
 # define the code versions to be used
 ELRONDGO_VER='tags/v1.0.19'		# see https://github.com/ElrondNetwork/elrond-go/releases/latest
-ELRONDGO_BRANCH='master'		# default: 'master', could also by 'development', or another tag
 ELRONDCONFIG_VER='tags/testnet-1018'	# see https://github.com/ElrondNetwork/elrond-config/releases/latest
-ELRONDCONFIG_BRANCH='master'		# default: 'master', could also by 'development', or another tag
 
 # define where the backup pem key files for each node are (to be) stored
 # make sure the pem files for each node are stored in $BACKUP_ALL_KEYS_FOLDER/xxxxxxxxxxxx
