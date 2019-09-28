@@ -249,20 +249,18 @@ fi
 
 cd $ELROND_FOLDER
 
-#clone repos
+#Clone/update the elrond-go & elrond-config repos
 git clone https://github.com/ElrondNetwork/elrond-go
-cd $SOURCE_ELRONDGO_FOLDER && git checkout --force $ELRONDGO_VER
+cd $SOURCE_ELRONDGO_FOLDER
+git fetch --all
+git reset --hard origin/master
 git checkout $ELRONDGO_BRANCH
-git fetch
-git reset --hard
-git pull
 cd $ELROND_FOLDER
 git clone https://github.com/ElrondNetwork/elrond-config
-cd $SOURCE_ELRONDCONFIG_FOLDER && git checkout --force $ELRONDCONFIG_VER
-git checkout $ELRONDCONFIG_BRANCH
-git fetch
-git reset --hard
-git pull
+cd $SOURCE_ELRONDGO_FOLDER
+git fetch --all
+git reset --hard origin/master
+git checkout $ELRONDGO_BRANCH
 
 # copy fresh elrond-config to the node config folder
 # and insert friendly node names in config.toml
@@ -278,7 +276,6 @@ done
 cd $SOURCE_ELRONDGO_FOLDER
 GO111MODULE=on go mod vendor
 cd $SOURCE_ELRONDGO_FOLDER/cmd/node && go build -i -v -ldflags="-X main.appVersion=$(git describe --tags --long --dirty)"
-
 # copy fresh node binary to $default_node_folder[i]
 for i in "${!USE_KEYS[@]}"; do
 	# copy fresh elrond-config to the node config folder
