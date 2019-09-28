@@ -103,6 +103,26 @@ for i in "${!USE_KEYS[@]}"; do
 			use_keys_logs="$(dirname $folder)/logs"
 			use_keys_stats="$(dirname $folder)/stats"
 
+			# clean up folders in the default node folder structure that are not required
+			if [[ "${KEEPDB_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/db ]]; then
+				echo -n "Are you sure you want to remove the /db folder for initialNodesPk "
+				read -p "${USE_KEYS[i]}...? [y/n] : " are_you_sure
+				if [[ $are_you_sure == "y" ]]; then
+					echo "Removing the /db folder for initialNodesPk ${USE_KEYS[i]}..."
+					sudo rm -rf ${default_node_folder[i]}/db
+				else
+					echo -n "Despite the settings in nodes_config.sh, keeping the /db "
+					echo "folder for initialNodesPk ${USE_KEYS[i]}..."
+				fi
+			fi
+			if [[ "${KEEPLOGS_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/logs ]]; then
+				sudo rm -rf ${default_node_folder[i]}/logs	# confirmation not needed for /logs
+			fi
+			if [[ "${KEEPSTATS_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/stats ]]; then
+				sudo rm -rf ${default_node_folder[i]}/stats	# confirmation not needed for /stats
+			fi
+
+
 			if [[ ( "${KEEPDB_KEYS[i]^^}" != "NO" && -d "$use_keys_db" ) || \
 			      ( "${KEEPLOGS_KEYS[i]^^}" != "NO" && -d "$use_keys_logs" ) || \
 			      ( "${KEEPSTATS_KEYS[i]^^}" != "NO" && -d "$use_keys_stats" ) ]]; then
@@ -123,26 +143,12 @@ for i in "${!USE_KEYS[@]}"; do
 					# clean up if folders are not required, ask for confirmation before removing /db folder
 					if [[ "${KEEPDB_KEYS[i]^^}" != "NO" && -d "$use_keys_db" ]]; then
 						sudo mv -nu ${mainfolder_existing_node[i]}/db ${default_node_folder[i]}
-					elif [[ "${KEEPDB_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/db ]]; then
-						echo -n "Are you sure you want to remove the /db folder for initialNodesPk "
-						read -p "${USE_KEYS[i]}...? [y/n] : " are_you_sure
-						if [[ $are_you_sure == "y" ]]; then
-							echo "Removing the /db folder for initialNodesPk ${USE_KEYS[i]}..."
-							sudo rm -rf ${default_node_folder[i]}/db
-						else
-							echo -n "Despite the settings in nodes_config.sh, keeping the /db "
-							echo "folder for initialNodesPk ${USE_KEYS[i]}..."
-						fi
 					fi
 					if [[ "${KEEPLOGS_KEYS[i]^^}" != "NO" && -d "$use_keys_logs" ]]; then
 						sudo mv -nu ${mainfolder_existing_node[i]}/logs ${default_node_folder[i]}
-					elif [[ "${KEEPLOGS_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/logs ]]; then
-						sudo rm -rf ${default_node_folder[i]}/logs	# confirmation not needed for /logs
 					fi
 					if [[ "${KEEPSTATS_KEYS[i]^^}" != "NO" && -d "$use_keys_stats" ]]; then
 						sudo mv -nu ${mainfolder_existing_node[i]}/stats ${default_node_folder[i]}
-					elif [[ "${KEEPSTATS_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/stats ]]; then
-						sudo rm -rf ${default_node_folder[i]}/stats	# confirmation not needed for /stats
 					fi
 				fi
 			fi
@@ -247,10 +253,16 @@ cd $ELROND_FOLDER
 git clone https://github.com/ElrondNetwork/elrond-go
 cd $SOURCE_ELRONDGO_FOLDER && git checkout --force $ELRONDGO_VER
 git checkout $ELRONDGO_BRANCH
+git fetch
+git reset --hard
+git pull
 cd $ELROND_FOLDER
 git clone https://github.com/ElrondNetwork/elrond-config
 cd $SOURCE_ELRONDCONFIG_FOLDER && git checkout --force $ELRONDCONFIG_VER
 git checkout $ELRONDCONFIG_BRANCH
+git fetch
+git reset --hard
+git pull
 
 # copy fresh elrond-config to the node config folder
 # and insert friendly node names in config.toml
