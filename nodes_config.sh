@@ -18,8 +18,8 @@ SOURCE_ELRONDGO_FOLDER="$ELROND_FOLDER/elrond-go"
 NODE_FOLDER_PREFIX="$ELROND_FOLDER/elrond-go-node-"  # this will be followed by $USE_KEYS[i]
 
 # use the latest releases of the ElrondNetwork/elrond-go and ElrondNetwork/elrond-config repos on Github
-ELRONDGO_VER="tags/$(curl "https://api.github.com/repos/ElrondNetwork/elrond-go/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')"
-ELRONDCONFIG_VER="tags/$(curl "https://api.github.com/repos/ElrondNetwork/elrond-config/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')"
+ELRONDGO_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwork/elrond-go/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')"
+ELRONDCONFIG_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwork/elrond-config/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')"
 
 # other settings
 SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01` and so on
