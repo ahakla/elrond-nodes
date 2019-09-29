@@ -6,10 +6,7 @@
 set -e
 
 # define screen colors
-RED='\x1B[0;31m'
-CYAN='\x1B[0;36m'
-GREEN='\x1B[0;32m'
-NC='\x1B[0m'
+RED='\x1B[0;31m'; CYAN='\x1B[0;36m'; GREEN='\x1B[0;32m'; NC='\x1B[0m'
 
 # use default setup according to ElrondNetwork/elrond-go-scripts repository
 ELROND_FOLDER="$GOPATH/src/github.com/ElrondNetwork"
@@ -18,8 +15,10 @@ SOURCE_ELRONDGO_FOLDER="$ELROND_FOLDER/elrond-go"
 NODE_FOLDER_PREFIX="$ELROND_FOLDER/elrond-go-node-"  # this will be followed by $USE_KEYS[i]
 
 # use the latest releases of the ElrondNetwork/elrond-go and ElrondNetwork/elrond-config repos on Github
-ELRONDGO_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwork/elrond-go/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')"
-ELRONDCONFIG_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwork/elrond-config/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')"
+ELRONDGO_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwork/elrond-go/releases/latest" \
+		| grep -Po '"tag_name": "\K.*?(?=")')"
+ELRONDCONFIG_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwork/elrond-config/releases/latest" \
+		| grep -Po '"tag_name": "\K.*?(?=")')"
 
 # other settings
 SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01` and so on
