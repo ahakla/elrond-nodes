@@ -1,6 +1,8 @@
 # elrond-nodes
 
 This repository enables you to install/update one or multiple Elrond nodes on Ubuntu 18.04.
+For a Medium post about how to use this repository, see
+https://medium.com/@haklander/run-and-maintain-one-or-multiple-elrond-nodes-in-ubuntu-18-04-5f5c9658e580
 
 ### Installation
 
