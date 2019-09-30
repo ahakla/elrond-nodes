@@ -9,7 +9,9 @@ set -e
 RED='\x1B[0;31m'; CYAN='\x1B[0;36m'; GREEN='\x1B[0;32m'; NC='\x1B[0m'
 
 # set $GOPATH if not set and export to ~/.profile along with Go binary path
-if [[ $GOPATH=="" ]]; then; GOPATH="$HOME/go"; fi
+if [[ $GOPATH=="" ]]; then
+	GOPATH="$HOME/go"
+fi
 echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
 echo "export GOPATH=$GOPATH" >> ~/.profile
 source ~/.profile
