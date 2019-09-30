@@ -1,25 +1,25 @@
 #!/bin/bash
 
-# this script will run all $NUMBER_OF_NODES nodes
+# This script will run all $NUMBER_OF_NODES nodes in Screen sessions.
 
-# exit script immediately on error
+# Exit script immediately on error:
 set -e
 
-# source the general node config file, which should be in the same folder as the current script
+# Source the general node config file, which should be in the same folder as the current script:
 source ./nodes_config.sh
 
 for i in $( seq 0 $((NUMBER_OF_NODES - 1)) ); do
 	default_node_folder[i]="$NODE_FOLDER_PREFIX${USE_KEYS[i]}"  # default node folder for $USE_KEYS[i]
+	cd ${default_node_folder[i]}
 
 	suffix="$(printf "%02d" $((i+1)))"
 	rest_api_port=$((8080+i))
 
-	# run node in virtual screen session: $session_name
-	# user can recover this virtual screen with: screen -r $session_name
-	# for a single node, this will be: screen -r node-01
-	# to detach from that virtual screen again: <Ctrl+a>, followed by <d>
+	# Run node in virtual Screen session: $session_name.
+	# The user can switch to this session with: screen -r $session_name
+	# For a single node, this will be: screen -r node-01
+	# To detach from that session again: <Ctrl+a>, followed by <d>
 	session_name="$SESSION_PREFIX$suffix"
-	cd ${default_node_folder[i]}
 	screen -A -m -d -S $session_name ./node --rest-api-port $rest_api_port
 done
 
@@ -30,5 +30,5 @@ echo -e "Output 'screen -ls':"
 echo ---------------
 screen -ls
 echo --------------
-echo -e "Use ${CYAN}screen -r '${SESSION_PREFIX}##'${NC} to see the node dashboard."
-echo -e "(Inside the screen session, you can type: ${CYAN}'Ctrl+a', followed by 'd'${NC} to return to this shell.)"
+echo -e "Use ${CYAN}screen -r ${SESSION_PREFIX}##${NC} (## = 01, 02, etc.) to see the node dashboard."
+echo -e "(Inside the Screen session, you can type: ${CYAN}'Ctrl+a', followed by 'd'${NC} to return to this shell.)"

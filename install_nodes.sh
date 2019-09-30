@@ -1,15 +1,15 @@
 #!/bin/bash
 
-# this installation script will make a clean install for $NUMBER_OF_NODES nodes
+# This installation script will make a clean install for $NUMBER_OF_NODES nodes.
 
-# exit script immediately on error
+# Exit script immediately on error:
 set -e
 
-# source the general node config file, which should be in the same folder as the current script
+# Source the general node config file, which should be in the same folder as the current script:
 source ./nodes_config.sh
 scripts_folder=$PWD
 
-# first check if the user has stopped all their nodes
+# First check if the user has stopped all their nodes:
 stopped_nodes_answer=""		# initialize as empty
 while [[  $stopped_nodes_answer != "y" && $stopped_nodes_answer != "exit" ]] ; do
 	read -p "Have you stopped all node instances? [y/exit] : " stopped_nodes_answer
@@ -23,7 +23,7 @@ while [[  $stopped_nodes_answer != "y" && $stopped_nodes_answer != "exit" ]] ; d
 	fi
 done
 
-# then check if the user has customized nodes_config.sh
+# Then check if the user has customized nodes_config.sh:
 cust_answer=""			# initialize as empty
 while [[  $cust_answer != "y" && $cust_answer != "exit" ]] ; do
 	read -p "Have you customized nodes_config.sh? [y/exit] : " cust_answer
@@ -37,17 +37,16 @@ while [[  $cust_answer != "y" && $cust_answer != "exit" ]] ; do
 	fi
 done
 
-# create $ELROND_FOLDER and $BACKUP_ALLKEYS_FOLDER if they do not exist
+# Create $ELROND_FOLDER and $BACKUP_ALLKEYS_FOLDER if they do not exist:
 mkdir -p $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER
 
-# recursively search $ELROND_FOLDER and $BACKUP_ALL_KEYS_FOLDER for folders that contain
-# both pem key files and put them in a string of strings called $folders_with_keys,
-# excluding subfolders of the elrond-config and elrond-go repos
+# Recursively search $ELROND_FOLDER and $BACKUP_ALL_KEYS_FOLDER for folders that contain both pem key files and put
+# them in a string of strings called $folders_with_keys, excluding subfolders of the elrond-config and elrond-go repos:
 folders_with_keys=$(find $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER -type d \
 		-not -path "$SOURCE_ELRONDCONFIG_FOLDER/*" -not -path "$SOURCE_ELRONDGO_FOLDER/*" \
 		-exec test -f '{}'/initialNodesSk.pem -a -f '{}'/initialBalancesSk.pem \; -print)
 
-# to be safe, back up all the keys that have been found in $folders_with_keys to $BACKUP_ALLKEYS_FOLDER
+# To be safe, back up all the keys that have been found in $folders_with_keys to $BACKUP_ALLKEYS_FOLDER:
 for folder in $folders_with_keys; do
 	contents_initialNodesSk=$(<"$folder/initialNodesSk.pem")
 	key_id="${contents_initialNodesSk:27:12}"
@@ -63,10 +62,10 @@ done
 
 for i in "${!USE_KEYS[@]}"; do
 	# $mainfolder_existing_node[i] is folder where pem key files for $USE_KEYS[i] are found...
-	# ...and for which all the required ../db ../logs ../stats folders exist
+	# ...and for which all the required ../db ../logs ../stats folders exist.
 	mainfolder_existing_node[i]=""	# initialize at ""
 
-	# keys_found is "yes" as soon as the pem key files for $USE_KEYS[i] are found
+	# keys_found is "yes" as soon as the pem key files for $USE_KEYS[i] are found.
 	keys_found="no"			# initialize at "no"
 
 	default_backup_keys_folder[i]="$BACKUP_ALLKEYS_FOLDER/${USE_KEYS[i]}"  # default backup folder for $USE_KEYS[i]
@@ -76,27 +75,29 @@ for i in "${!USE_KEYS[@]}"; do
 	echo -e "Searching pem key files and required folders for initialNodesPk ${CYAN}${USE_KEYS[i]}..."
 	for folder in $folders_with_keys; do
 
-		# search for matching initialNodesPk's in each folder that contains both pem key files
+		# Search for matching initialNodesPk's in each folder that contains both pem key files:
 		contents_initialNodesSk=$(<"$folder/initialNodesSk.pem")
 		if [[ "${USE_KEYS[i]}" == "${contents_initialNodesSk:27:12}" ]]; then
+			# If the pem key files for $USE_KEYS[i] are found in $folder, then...
 
-			# if the pem key files for $USE_KEYS[i] are found in $folder
 			keys_found="yes"
 
-			# create a new default node structure for $USE_KEYS[i] if it does not yet exist,
-			# avoiding a cp `are the same file` error
+			# Create a new default node structure for $USE_KEYS[i] if it does not yet exist,
+			# avoiding a cp `are the same file` error:
 			mkdir -p ${default_node_folder[i]}/config
 			if [[ "$folder" != "${default_node_folder[i]}/config" ]]; then
 				cp $folder/initial{Nodes,Balances}Sk.pem ${default_node_folder[i]}/config
 			fi
 
-			# now check if the pem key files reside in a node folder structure with any of the required folders
+			# Check if the pem key files reside in a node folder structure with any of the required folders:
 			use_keys_db="$(dirname $folder)/db"
 			use_keys_logs="$(dirname $folder)/logs"
 			use_keys_stats="$(dirname $folder)/stats"
 
-			# clean up folders in the default node folder structure that are not required
+			# Clean up folders in the default node folder structure that are not required:
 			if [[ "${KEEPDB_KEYS[i]^^}" == "NO" && -d ${default_node_folder[i]}/db ]]; then
+
+				# Ask for confirmation before removing /db folder:
 				echo -n "Are you sure you want to remove the /db folder for initialNodesPk "
 				read -p "${USE_KEYS[i]}...? [y/n] : " are_you_sure
 				if [[ $are_you_sure == "y" ]]; then
@@ -118,21 +119,21 @@ for i in "${!USE_KEYS[@]}"; do
 			if [[ ( "${KEEPDB_KEYS[i]^^}" != "NO" && -d "$use_keys_db" ) || \
 			      ( "${KEEPLOGS_KEYS[i]^^}" != "NO" && -d "$use_keys_logs" ) || \
 			      ( "${KEEPSTATS_KEYS[i]^^}" != "NO" && -d "$use_keys_stats" ) ]]; then
-				# if the pem key files for $USE_KEYS[i] reside in a node folder structure where at
+				# If the pem key files for $USE_KEYS[i] reside in a node folder structure where at
 				# least one of the required ../db, ../logs, ../stats subfolders for $USE_KEYS[i] exists,
-				# then copy the existing node subfolder(s) to $default_node_folder[i]
+				# then copy the existing node subfolder(s) to $default_node_folder[i].
 
 				mainfolder_existing_node[i]="$(dirname $folder)"
 				echo -e -n "${GREEN}Found${NC} required node subfolders for initialNodesPk ${USE_KEYS[i]}... "
 				echo -e "in ${mainfolder_existing_node[i]}."
 
 				if [[ "${mainfolder_existing_node[i]}" != "${default_node_folder[i]}" ]]; then
-					# do not copy to self
+					# Do not copy to self.
+
 					echo -e -n "Moving required node subfolders from ${mainfolder_existing_node[i]} to "
 					echo "${default_node_folder[i]}."
 
-					# move the required data to the $default_node_folder[i] structure
-					# clean up if folders are not required, ask for confirmation before removing /db folder
+					# Move the required data that were found to the $default_node_folder[i] structure:
 					if [[ "${KEEPDB_KEYS[i]^^}" != "NO" && -d "$use_keys_db" ]]; then
 						sudo mv -nu ${mainfolder_existing_node[i]}/db ${default_node_folder[i]}
 					fi
@@ -148,7 +149,8 @@ for i in "${!USE_KEYS[@]}"; do
 	done
 
 	if [[ $keys_found == "no" ]]; then
-		# if the pem key files for $USE_KEYS[i] can't be found anywhere
+		# If the pem key files for $USE_KEYS[i] can't be found anywhere:
+
 		echo -e "${RED}Could not find${NC} pem key files for initialNodesPk ${USE_KEYS[i]}... anywhere!"
 		echo -e "${RED}Please re-customize nodes_config.sh!${NC} Exiting script."
 		exit
@@ -156,18 +158,18 @@ for i in "${!USE_KEYS[@]}"; do
 done
 
 if [[ "${CLEANUP^^}" == "YES" ]]; then
-	# clean up
-	# remove all $folders_with_keys, except for $BACKUP_ALLKEYS_FOLDER and $default_node_folder[i]
-	# if the folder basename is config, then recursively remove the parent folder too, assuming a node folder structure
+	# Clean up:
+	# Remove all $folders_with_keys, except for $BACKUP_ALLKEYS_FOLDER and $default_node_folder[i].
+	# If the folder's basename is config, then recursively remove the parent folder too, assuming a node folder structure.
 
 	for folder in $folders_with_keys; do
 
 		match=0
 		for i in "${!USE_KEYS[@]}"; do
 		 	if [[ "$folder" == "${default_backup_keys_folder[i]}" ||  "$folder" == "${default_node_folder[i]}/config" ]]; then
-				# if the pem keys in $folder reside in $default_backup_keys_folder[i] or
+				# If the pem keys in $folder reside in $default_backup_keys_folder[i] or
 				# $default_node_folder[i]/config for any of the $USE_KEY[i],
-				# then do not remove $folder
+				# then do not remove $folder.
 			        match=1
 			        break
 			fi
@@ -202,14 +204,13 @@ echo -e
 echo -e "${GREEN}--> installing elrond-go nodes as specified in nodes_config.sh...${NC}"
 echo -e
 
-# setup
-# making sure the distro is up-to-date
+# Making sure the distro is up-to-date:
 sudo apt update && sudo apt dist-upgrade -y
 
-# install some dependencies
+# Install some dependencies:
 sudo apt install -y git curl screen tmux
 
-# check if go is already installed
+# Check if go is already installed:
 if ! [ -x "$(command -v go)" ];
 
     then
@@ -231,7 +232,7 @@ if ! [ -x "$(command -v go)" ];
 
   fi
 
-# clean up old installations
+# Clean up old installations:
 if [[ -d $SOURCE_ELRONDGO_FOLDER ]]; then
 	sudo rm -rf $SOURCE_ELRONDGO_FOLDER
 fi
@@ -241,15 +242,14 @@ fi
 
 cd $ELROND_FOLDER
 
-# clone the elrond-go & elrond-config repos
+# Clone the elrond-go & elrond-config repos:
 git clone https://github.com/ElrondNetwork/elrond-go
 cd $SOURCE_ELRONDGO_FOLDER && git checkout --force $ELRONDGO_VER
 cd $ELROND_FOLDER
 git clone https://github.com/ElrondNetwork/elrond-config
 cd $SOURCE_ELRONDCONFIG_FOLDER && git checkout --force $ELRONDCONFIG_VER
 
-# copy fresh elrond-config to the node config folder
-# and insert friendly node names in config.toml
+# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml:
 for i in "${!USE_KEYS[@]}"; do
 	cp $SOURCE_ELRONDCONFIG_FOLDER/*.* ${default_node_folder[i]}/config
 
@@ -258,27 +258,26 @@ for i in "${!USE_KEYS[@]}"; do
 	fi
 done
 
-# compile elrond-go
+# Compile elrond-go:
 cd $SOURCE_ELRONDGO_FOLDER
 GO111MODULE=on go mod vendor
 cd $SOURCE_ELRONDGO_FOLDER/cmd/node && go build -i -v -ldflags="-X main.appVersion=$(git describe --tags --long --dirty)"
-# copy fresh node binary to $default_node_folder[i]
+# Copy fresh node binary to $default_node_folder[i]:
 for i in "${!USE_KEYS[@]}"; do
-	# copy fresh elrond-config to the node config folder
 	cp $SOURCE_ELRONDGO_FOLDER/cmd/node/node ${default_node_folder[i]}
 done
 
-# identity key-gen
+# Build key generator:
 cd $SOURCE_ELRONDGO_FOLDER/cmd/keygenerator
 go build
 
-# prepare appending settings for the new nodes identities
+# Prepare for appending settings for the new nodes identities:
 use_keys_string_new="${USE_KEYS[@]}"
 keepdb_keys_string_new="${KEEPDB_KEYS[@]}"
 keeplogs_keys_string_new="${KEEPLOGS_KEYS[@]}"
 keepstats_keys_string_new="${KEEPSTATS_KEYS[@]}"
 
-# create new pem key files for the remaining nodes and make a backup
+# Create new pem key files for the remaining nodes and make a backup:
 number_of_existing_nodes=${#USE_KEYS[@]}
 number_of_new_nodes=$((NUMBER_OF_NODES-number_of_existing_nodes))
 for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
@@ -288,7 +287,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	contents_initialNodesSk=$(<"initialNodesSk.pem")
 	key_id="${contents_initialNodesSk:27:12}"
 
-	# create a backup of the pem key files in $BACKUP_ALLKEYS_FOLDER/$key_id
+	# Create a backup of the pem key files in $BACKUP_ALLKEYS_FOLDER/$key_id:
 	mkdir -p "$BACKUP_ALLKEYS_FOLDER/$key_id"
 	cp initial{Nodes,Balances}Sk.pem "$BACKUP_ALLKEYS_FOLDER/$key_id"
 
@@ -296,25 +295,25 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	mkdir -p $default_new_node_folder/config
 	cp initial{Nodes,Balances}Sk.pem $default_new_node_folder/config
 
-	# appending new node identities to settings
+	# Appending new node identities to settings:
 	use_keys_string_new="${use_keys_string_new} $key_id"
 	keepdb_keys_string_new="${keepdb_keys_string_new} yes"		# safest default is yes
 	keeplogs_keys_string_new="${keeplogs_keys_string_new} no"	# default is no
 	keepstats_keys_string_new="${keepstats_keys_string_new} no"	# default is no
 
-	# copy fresh elrond-config to the node config folder
-	# and insert friendly node names in config.toml
+	# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml
 	cp $SOURCE_ELRONDCONFIG_FOLDER/*.* $default_new_node_folder/config
 	i=$((number_of_existing_nodes + new_node))
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
-	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' $default_new_node_folder/config/config.toml
+	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' \
+		$default_new_node_folder/config/config.toml
 	fi
 
-	# copy fresh node binary to $default_new_node_folder
+	# Copy fresh node binary to $default_new_node_folder:
 	cp $SOURCE_ELRONDGO_FOLDER/cmd/node/node $default_new_node_folder
 done
 
-# modify ./nodes_config.sh to include new node identities
+# Modify ./nodes_config.sh to include new node identities:
 sed -i 's/^USE_KEYS=([^)]*)/USE_KEYS=('"$use_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 sed -i 's/^KEEPDB_KEYS=([^)]*)/KEEPDB_KEYS=('"$keepdb_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 sed -i 's/^KEEPLOGS_KEYS=([^)]*)/KEEPLOGS_KEYS=('"$keeplogs_keys_string_new"')/g' $scripts_folder/nodes_config.sh

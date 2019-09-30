@@ -1,26 +1,26 @@
 #!/bin/bash
 
-# this script will run all $NUMBER_OF_NODES nodes
+# This script will run all $NUMBER_OF_NODES nodes in tmux sessions.
 
-# exit script immediately on error
+# Exit script immediately on error:
 set -e
 
-# source the general node config file, which should be in the same folder as the current script
+# Source the general node config file, which should be in the same folder as the current script:
 source ./nodes_config.sh
 
 for i in $( seq 0 $((NUMBER_OF_NODES - 1)) ); do
 	default_node_folder[i]="$NODE_FOLDER_PREFIX${USE_KEYS[i]}"  # default node folder for $USE_KEYS[i]
+	cd ${default_node_folder[i]}
 
 	suffix="$(printf "%02d" $((i+1)))"
 	rest_api_port=$((8080+i))
 
-	# run node in background session: tmux_session_name
-	# user can switch to this session by using: tmux a -t $session_name
-	# for a single node, this will be: tmux a -t node-01
-	# to detach from that session again: <Ctrl+b>, followed by <d>
+	# Run node in virtual tmux session: $session_name.
+	# The user can switch to this session with: tmux a -t $session_name
+	# For a single node, this will be: tmux a -t node-01
+	# To detach from that session again: <Ctrl+b>, followed by <d>
 	session_name="$SESSION_PREFIX$suffix"
 	tmux new-session -d -s "$session_name"
-	tmux send -t "$session_name" "cd ${default_node_folder[i]}" ENTER
 	tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
 done
 
@@ -31,5 +31,5 @@ echo -e "Output 'tmux ls':"
 echo ---------------
 tmux ls
 echo --------------
-echo -e "Use ${CYAN}tmux a -t '${SESSION_PREFIX}##'${NC} to see the node dashboard."
+echo -e "Use ${CYAN}tmux a -t ${SESSION_PREFIX}##${NC} (## = 01, 02, etc.) to see the node dashboard."
 echo -e "(Inside the tmux session, you can type: ${CYAN}'Ctrl+b', followed by 'd'${NC} to return to this shell.)"
