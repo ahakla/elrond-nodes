@@ -32,7 +32,7 @@ ELRONDCONFIG_VER="tags/$(curl --silent "https://api.github.com/repos/ElrondNetwo
 SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01` and so on
 
 ##################################################################################
-##                          EDIT BELOW WHERE NECESSARY                          ##
+##          !!!             EDIT BELOW WHERE NECESSARY             !!!          ##
 ##################################################################################
 
 # define where the backup pem key files for each node are (to be) stored
@@ -40,9 +40,9 @@ SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01`
 # where xxxxxxxxxxxx are the first 12 characters of the initialNodesPk's for the pem keys pair
 BACKUP_ALLKEYS_FOLDER="$HOME/elrond_backup_keys"	# where are the pem key files for each node stored?
 
-# define the nodes you want to run
-NUMBER_OF_NODES=2
-NODE_NAMES=('Mystic1' 'Mystic2')	# the array size should correspond with $NUMBER_OF_NODES
+# define the nodes you want to run, $NODE_NAMES should be array of $NUMBER_OF_NODES strings
+NUMBER_OF_NODES=3
+NODE_NAMES=('your_name (1)' 'your_name (2)' 'your_name (3)')
 
 # define a $USE_KEYS array with the first 12 characters of the initialNodesPk's that should be re-used
 # normally, the number of elements in $USE_KEYS would equal $NUMBER_OF_NODES, but...
@@ -52,11 +52,11 @@ NODE_NAMES=('Mystic1' 'Mystic2')	# the array size should correspond with $NUMBER
 # if the keys in $USE_KEYS are not found in the $BACKUP_ALLKEYS_FOLDER, they will be searched
 # in the existing node folders and copied to $BACKUP_ALLKEYS_FOLDER if necessary
 # the $KEEP..._KEYS arrays are parallel arrays, meaning their index corresponds with $USE_KEYS
-USE_KEYS=(4ec8b4269c28 7850694d20c7)		# use these existing pem key files (first 12 chars of initialNodesPk)
-KEEPDB_KEYS=(no no)				# keep existing /db folders? (default: yes)
-KEEPLOGS_KEYS=(no no)				# keep existing /logs folders? (default: no)
-KEEPSTATS_KEYS=(no no)				# keep existing /stats folders? (default: no)
+USE_KEYS=(initNodes1Pk initNodes2Pk initNodes3Pk)	# array with first 12 chars of initialNodesPk's to be used
+KEEPDB_KEYS=(yes yes yes)				# keep existing /db folders? (for new testnet launch: no)
+KEEPLOGS_KEYS=(no no no)				# keep existing /logs folders? (default: no)
+KEEPSTATS_KEYS=(no no no)				# keep existing /stats folders? (default: no)
 
 # remove all unused node folder structures within $ELROND_FOLDER, if they are found?
-# this could free unused disk space but if you are unsure, set CLEANUP=no
+# this could free disk space but if you are unsure, set CLEANUP=no
 CLEANUP=yes
