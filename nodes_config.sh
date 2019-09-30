@@ -18,8 +18,6 @@ source ~/.profile
 
 # Use default setup according to ElrondNetwork/elrond-go-scripts repository:
 ELROND_FOLDER="$GOPATH/src/github.com/ElrondNetwork"
-SOURCE_ELRONDCONFIG_FOLDER="$ELROND_FOLDER/elrond-config"
-SOURCE_ELRONDGO_FOLDER="$ELROND_FOLDER/elrond-go"
 NODE_FOLDER_PREFIX="$ELROND_FOLDER/elrond-go-node-"	# this will be followed by $USE_KEYS[i]
 
 # Use latest releases of the ElrondNetwork/elrond-go and ElrondNetwork/elrond-config repos on Github:

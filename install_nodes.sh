@@ -43,7 +43,7 @@ mkdir -p $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER
 # Recursively search $ELROND_FOLDER and $BACKUP_ALL_KEYS_FOLDER for folders that contain both pem key files and put
 # them in a string of strings called $folders_with_keys, excluding subfolders of the elrond-config and elrond-go repos:
 folders_with_keys=$(find $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER -type d \
-		-not -path "$SOURCE_ELRONDCONFIG_FOLDER/*" -not -path "$SOURCE_ELRONDGO_FOLDER/*" \
+		-not -path "$ELROND_FOLDER/elrond-config/*" -not -path "$ELROND_FOLDER/elrond-go/*" \
 		-exec test -f '{}'/initialNodesSk.pem -a -f '{}'/initialBalancesSk.pem \; -print)
 
 # To be safe, back up all the keys that have been found in $folders_with_keys to $BACKUP_ALLKEYS_FOLDER:
@@ -233,25 +233,25 @@ if ! [ -x "$(command -v go)" ];
   fi
 
 # Clean up old installations:
-if [[ -d $SOURCE_ELRONDGO_FOLDER ]]; then
-	sudo rm -rf $SOURCE_ELRONDGO_FOLDER
+if [[ -d $ELROND_FOLDER/elrond-go ]]; then
+	sudo rm -rf $ELROND_FOLDER/elrond-go
 fi
-if [[ -d $SOURCE_ELRONDCONFIG_FOLDER ]]; then
-	sudo rm -rf $SOURCE_ELRONDCONFIG_FOLDER
+if [[ -d $ELROND_FOLDER/elrond-config ]]; then
+	sudo rm -rf $ELROND_FOLDER/elrond-config
 fi
 
 cd $ELROND_FOLDER
 
 # Clone the elrond-go & elrond-config repos:
 git clone https://github.com/ElrondNetwork/elrond-go
-cd $SOURCE_ELRONDGO_FOLDER && git checkout --force $ELRONDGO_VER
+cd $ELROND_FOLDER/elrond-go && git checkout --force $ELRONDGO_VER
 cd $ELROND_FOLDER
 git clone https://github.com/ElrondNetwork/elrond-config
-cd $SOURCE_ELRONDCONFIG_FOLDER && git checkout --force $ELRONDCONFIG_VER
+cd $ELROND_FOLDER/elrond-config && git checkout --force $ELRONDCONFIG_VER
 
 # Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml:
 for i in "${!USE_KEYS[@]}"; do
-	cp $SOURCE_ELRONDCONFIG_FOLDER/*.* ${default_node_folder[i]}/config
+	cp $ELROND_FOLDER/elrond-config/*.* ${default_node_folder[i]}/config
 
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
 	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' ${default_node_folder[i]}/config/config.toml
@@ -259,16 +259,16 @@ for i in "${!USE_KEYS[@]}"; do
 done
 
 # Compile elrond-go:
-cd $SOURCE_ELRONDGO_FOLDER
+cd $ELROND_FOLDER/elrond-go
 GO111MODULE=on go mod vendor
-cd $SOURCE_ELRONDGO_FOLDER/cmd/node && go build -i -v -ldflags="-X main.appVersion=$(git describe --tags --long --dirty)"
+cd $ELROND_FOLDER/elrond-go/cmd/node && go build -i -v -ldflags="-X main.appVersion=$(git describe --tags --long --dirty)"
 # Copy fresh node binary to $default_node_folder[i]:
 for i in "${!USE_KEYS[@]}"; do
-	cp $SOURCE_ELRONDGO_FOLDER/cmd/node/node ${default_node_folder[i]}
+	cp $ELROND_FOLDER/elrond-go/cmd/node/node ${default_node_folder[i]}
 done
 
 # Build key generator:
-cd $SOURCE_ELRONDGO_FOLDER/cmd/keygenerator
+cd $ELROND_FOLDER/elrond-go/cmd/keygenerator
 go build
 
 # Prepare for appending settings for the new nodes identities:
@@ -281,7 +281,7 @@ keepstats_keys_string_new="${KEEPSTATS_KEYS[@]}"
 number_of_existing_nodes=${#USE_KEYS[@]}
 number_of_new_nodes=$((NUMBER_OF_NODES-number_of_existing_nodes))
 for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
-	cd $SOURCE_ELRONDGO_FOLDER/cmd/keygenerator	# just to be sure
+	cd $ELROND_FOLDER/elrond-go/cmd/keygenerator	# just to be sure
 	./keygenerator
 
 	contents_initialNodesSk=$(<"initialNodesSk.pem")
@@ -302,7 +302,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	keepstats_keys_string_new="${keepstats_keys_string_new} no"	# default is no
 
 	# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml
-	cp $SOURCE_ELRONDCONFIG_FOLDER/*.* $default_new_node_folder/config
+	cp $ELROND_FOLDER/elrond-config/*.* $default_new_node_folder/config
 	i=$((number_of_existing_nodes + new_node))
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
 	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' \
@@ -310,7 +310,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	fi
 
 	# Copy fresh node binary to $default_new_node_folder:
-	cp $SOURCE_ELRONDGO_FOLDER/cmd/node/node $default_new_node_folder
+	cp $ELROND_FOLDER/elrond-go/cmd/node/node $default_new_node_folder
 done
 
 # Modify ./nodes_config.sh to include new node identities:
