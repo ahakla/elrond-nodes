@@ -34,12 +34,12 @@ You can use this repo for different scenarios:
 ----------------------------------------------------------
 
 Here is how you could setup your `nodes_config.sh` in these scenario's, prior to running `install_nodes.sh`.
+**Always carefully review all the settings below `!!! EDIT BELOW WHERE NECESSARY !!!`.**
 
 1. Set `USE_KEYS=()`, `KEEPDB_KEYS=()`, `KEEPLOGS_KEYS=()`, `KEEPSTATS_KEYS=()`.
 
-2. Carefully review all the settings below `!!! EDIT BELOW WHERE NECESSARY !!!`.
-You will probably have registered the initialNodesPk and the initialBalancesPk. Suppose you had two nodes for
-which the first 12 characters (key-id's) in initialNodesPk were 86001ab0d380 and 22a5a948582d. Then you set
+2. You will probably have registered the initialNodesPk and the initialBalancesPk. Suppose you had two nodes
+for which the first 12 characters (key-id's) in initialNodesPk were 86001ab0d380 and 22a5a948582d. Then you set
 `NUMBER_OF_NODES=2` and `NODE_NAMES=('your_name (1)' 'your_name (2)')`, or any other friendly node names you
 would like to give your nodes. You set the array `USE_KEYS=(86001ab0d380 22a5a948582d)`, and if you want to keep
 the nodes' databases to not have to synchronize again (unless there is a new testnet), you can set the array
