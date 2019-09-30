@@ -10,7 +10,7 @@ Instructions for using this repository:
 (like `$HOME/elrond_backup_keys/node1` and `$HOME/elrond_backup_keys/node2`), and copy your `initialNodesSk.pem`
 and `initialBalancesSk.pem` there
 
- * `git clone git@github.com:ahakla/elrond-nodes.git` - clone this repository
+ * `git clone https://github.com/ahakla/elrond-nodes.git` - clone this repository
  * `cd elrond-nodes` - open the folder with the scripts
  * `nano nodes_config.sh` - customize the nodes setup
  * stop all nodes, if they are still running (for tmux you may want to use `tmux kill-server`)
