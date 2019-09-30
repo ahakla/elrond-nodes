@@ -33,7 +33,7 @@ You can use this repo for different scenarios:
 
 ----------------------------------------------------------
 
-Here is how you could setup your `nodes_config.sh` in these scenario's, prior to running `install_nodes.sh`.
+Here is how you could setup your `nodes_config.sh` in these scenario's, prior to running `install_nodes.sh`. 
 **Always carefully review all the settings below `!!! EDIT BELOW WHERE NECESSARY !!!`.**
 
 1. Set `USE_KEYS=()`, `KEEPDB_KEYS=()`, `KEEPLOGS_KEYS=()`, `KEEPSTATS_KEYS=()`.
