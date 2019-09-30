@@ -5,14 +5,6 @@
 # exit script immediately on error
 set -e
 
-# set $GOPATH if not set and export to ~/.profile along with Go binary path
-if [[ $GOPATH=="" ]]; then
-	GOPATH="$HOME/go"
-fi
-echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
-echo "export GOPATH=$GOPATH" >> ~/.profile
-source ~/.profile
-
 # source the general node config file, which should be in the same folder as the current script
 source ./nodes_config.sh
 scripts_folder=$PWD

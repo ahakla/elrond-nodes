@@ -8,6 +8,12 @@ set -e
 # define screen colors
 RED='\x1B[0;31m'; CYAN='\x1B[0;36m'; GREEN='\x1B[0;32m'; NC='\x1B[0m'
 
+# set $GOPATH if not set and export to ~/.profile along with Go binary path
+if [[ $GOPATH=="" ]]; then; GOPATH="$HOME/go"; fi
+echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.profile
+echo "export GOPATH=$GOPATH" >> ~/.profile
+source ~/.profile
+
 # use default setup according to ElrondNetwork/elrond-go-scripts repository
 ELROND_FOLDER="$GOPATH/src/github.com/ElrondNetwork"
 SOURCE_ELRONDCONFIG_FOLDER="$ELROND_FOLDER/elrond-config"
@@ -33,8 +39,8 @@ SESSION_PREFIX='node-'			# terminal multiplexer sessions will be named `node-01`
 BACKUP_ALLKEYS_FOLDER="$HOME/elrond_backup_keys"	# where are the pem key files for each node stored?
 
 # define the nodes you want to run
-NUMBER_OF_NODES=2
-NODE_NAMES=('Alwin (1)' 'Alwin (2)')	# the array size should correspond with $NUMBER_OF_NODES
+NUMBER_OF_NODES=3
+NODE_NAMES=('node1' 'node2' 'node3')	# the array size should correspond with $NUMBER_OF_NODES
 
 # define a $USE_KEYS array with the first 12 characters of the initialNodesPk's that should be re-used
 # normally, the number of elements in $USE_KEYS would equal $NUMBER_OF_NODES, but...
@@ -43,8 +49,12 @@ NODE_NAMES=('Alwin (1)' 'Alwin (2)')	# the array size should correspond with $NU
 # these new pem key files will also be backed up in the $BACKUP_ALLKEYS_FOLDER
 # if the keys in $USE_KEYS are not found in the $BACKUP_ALLKEYS_FOLDER, they will be searched
 # in the existing node folders and copied to $BACKUP_ALLKEYS_FOLDER if necessary
-USE_KEYS=(86001ab0d380 22a5a948582d)	# use these existing pem key files (first 12 chars of initialNodesPk)
-KEEPDB_KEYS=(no no)			# keep existing /db folders? (default: yes)
-KEEPLOGS_KEYS=(no no)			# keep existing /logs folders? (default: no)
-KEEPSTATS_KEYS=(no no)			# keep existing /stats folders? (default: no)
-CLEANUP=yes				# within $ELROND_FOLDER, remove all unused node folder structures?
+# the $KEEP..._KEYS arrays are parallel arrays, meaning their index corresponds with $USE_KEYS
+USE_KEYS=(86001ab0d380 22a5a948582d 002838b272d9)	# use these existing pem key files (first 12 chars of initialNodesPk)
+KEEPDB_KEYS=(no no no)					# keep existing /db folders? (default: yes)
+KEEPLOGS_KEYS=(no no no)				# keep existing /logs folders? (default: no)
+KEEPSTATS_KEYS=(no no no)				# keep existing /stats folders? (default: no)
+
+# remove all unused node folder structures within $ELROND_FOLDER, if they are found?
+# this could free unused disk space but if you are unsure, set CLEANUP=no
+CLEANUP=yes
