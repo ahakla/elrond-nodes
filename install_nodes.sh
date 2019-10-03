@@ -296,10 +296,10 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	cp initial{Nodes,Balances}Sk.pem $default_new_node_folder/config
 
 	# Appending new node identities to settings:
-	use_keys_string_new="${use_keys_string_new} $key_id"
-	keepdb_keys_string_new="${keepdb_keys_string_new} yes"		# safest default is yes
-	keeplogs_keys_string_new="${keeplogs_keys_string_new} no"	# default is no
-	keepstats_keys_string_new="${keepstats_keys_string_new} no"	# default is no
+	use_keys_string_new=$(echo "$use_keys_string_new $key_id" | sed -e 's/^[ \t]*//')
+	keepdb_keys_string_new=$(echo "$keepdb_keys_string_new yes" | sed -e 's/^[ \t]*//')		# safest default is yes
+	keeplogs_keys_string_new=$(echo "$keeplogs_keys_string_new no" | sed -e 's/^[ \t]*//')		# default is no
+	keepstats_keys_string_new=$(echo "$keepstats_keys_string_new no" | sed -e 's/^[ \t]*//')	# default is no
 
 	# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml
 	cp $ELROND_FOLDER/elrond-config/*.* $default_new_node_folder/config
