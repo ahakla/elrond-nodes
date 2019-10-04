@@ -40,10 +40,9 @@ done
 # Create $ELROND_FOLDER and $BACKUP_ALLKEYS_FOLDER if they do not exist:
 mkdir -p $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER
 
-# Recursively search $ELROND_FOLDER and $BACKUP_ALL_KEYS_FOLDER for folders that contain both pem key files and put
-# them in a string of strings called $folders_with_keys, excluding subfolders of the elrond-config and elrond-go repos:
+# Recursively search $ELROND_FOLDER and $BACKUP_ALL_KEYS_FOLDER for folders that contain both pem key files
+# and put them in a string of strings called $folders_with_keys:
 folders_with_keys=$(find $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER -type d \
-		-not -path "$ELROND_FOLDER/elrond-config/*" -not -path "$ELROND_FOLDER/elrond-go/*" \
 		-exec test -f '{}'/initialNodesSk.pem -a -f '{}'/initialBalancesSk.pem \; -print)
 
 # To be safe, back up all the keys that have been found in $folders_with_keys to $BACKUP_ALLKEYS_FOLDER:
@@ -72,7 +71,7 @@ for i in "${!USE_KEYS[@]}"; do
 	default_node_folder[i]="$NODE_FOLDER_PREFIX${USE_KEYS[i]}"  # default node folder for $USE_KEYS[i]
 
 	echo
-	echo -e "Searching pem key files and required folders for initialNodesPk ${CYAN}${USE_KEYS[i]}..."
+	echo -e "Searching pem key files and required folders for initialNodesPk ${CYAN}${USE_KEYS[i]}...${NC}"
 	for folder in $folders_with_keys; do
 
 		# Search for matching initialNodesPk's in each folder that contains both pem key files:
@@ -135,13 +134,13 @@ for i in "${!USE_KEYS[@]}"; do
 
 					# Move the required data that were found to the $default_node_folder[i] structure:
 					if [[ "${KEEPDB_KEYS[i]^^}" != "NO" && -d "$use_keys_db" ]]; then
-						sudo mv -nu ${mainfolder_existing_node[i]}/db ${default_node_folder[i]}
+						sudo mv -u ${mainfolder_existing_node[i]}/db ${default_node_folder[i]}
 					fi
 					if [[ "${KEEPLOGS_KEYS[i]^^}" != "NO" && -d "$use_keys_logs" ]]; then
-						sudo mv -nu ${mainfolder_existing_node[i]}/logs ${default_node_folder[i]}
+						sudo mv -u ${mainfolder_existing_node[i]}/logs ${default_node_folder[i]}
 					fi
 					if [[ "${KEEPSTATS_KEYS[i]^^}" != "NO" && -d "$use_keys_stats" ]]; then
-						sudo mv -nu ${mainfolder_existing_node[i]}/stats ${default_node_folder[i]}
+						sudo mv -u ${mainfolder_existing_node[i]}/stats ${default_node_folder[i]}
 					fi
 				fi
 			fi
@@ -159,17 +158,18 @@ done
 
 if [[ "${CLEANUP^^}" == "YES" ]]; then
 	# Clean up:
-	# Remove all $folders_with_keys, except for $BACKUP_ALLKEYS_FOLDER and $default_node_folder[i].
+	# Remove all $folders_with_keys, except for $default_backup_keys_folder[i], $default_node_folder[i]/config,
+	# or any of the elrond-config / elrond-go repo subfolders.
 	# If the folder's basename is config, then recursively remove the parent folder too, assuming a node folder structure.
 
 	for folder in $folders_with_keys; do
 
 		match=0
 		for i in "${!USE_KEYS[@]}"; do
-		 	if [[ "$folder" == "${default_backup_keys_folder[i]}" ||  "$folder" == "${default_node_folder[i]}/config" ]]; then
-				# If the pem keys in $folder reside in $default_backup_keys_folder[i] or
-				# $default_node_folder[i]/config for any of the $USE_KEY[i],
-				# then do not remove $folder.
+		 	if [[ "$folder" == "${default_backup_keys_folder[i]}" || "$folder" == "${default_node_folder[i]}/config" || \
+				"$folder" == "$ELROND_FOLDER/elrond-config/"* || "$folder" == "$ELROND_FOLDER/elrond-go/"* ]]; then
+				# If the pem keys in $folder reside in $default_backup_keys_folder[i], $default_node_folder[i]/config,
+				# or any of the elrond-config / elrond-go repo subfolders... then do not remove $folder for $USE_KEY[i].
 			        match=1
 			        break
 			fi
