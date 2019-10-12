@@ -8,7 +8,7 @@ set -e
 # Source the general node config file, which should be in the same folder as the current script:
 source ./nodes_config.sh
 
-for i in $( seq 0 $((NUMBER_OF_NODES - 1)) ); do
+for i in "${!USE_KEYS[@]}"; do
 	default_node_folder[i]="$NODE_FOLDER_PREFIX${USE_KEYS[i]}"  # default node folder for $USE_KEYS[i]
 	cd ${default_node_folder[i]}
 
