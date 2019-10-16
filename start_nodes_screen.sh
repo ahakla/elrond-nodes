@@ -20,7 +20,10 @@ for i in "${!USE_KEYS[@]}"; do
 	# For a single node, this will be: screen -r node-01
 	# To detach from that session again: <Ctrl+a>, followed by <d>
 	session_name="$SESSION_PREFIX$suffix"
-	screen -A -m -d -S $session_name ./node --rest-api-port $rest_api_port
+
+	# Don't use the rest-api-port by default
+	# screen -A -m -d -S $session_name ./node --rest-api-port $rest_api_port
+	screen -A -m -d -S $session_name ./node
 done
 
 echo
