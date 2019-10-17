@@ -251,7 +251,7 @@ cd $ELROND_FOLDER/elrond-config && git checkout --force $ELRONDCONFIG_VER
 
 # Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml:
 for i in "${!USE_KEYS[@]}"; do
-	cp $ELROND_FOLDER/elrond-config/*.* ${default_node_folder[i]}/config
+	cp -f $ELROND_FOLDER/elrond-config/*.* ${default_node_folder[i]}/config
 
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
 	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' ${default_node_folder[i]}/config/config.toml
@@ -264,7 +264,7 @@ GO111MODULE=on go mod vendor
 cd $ELROND_FOLDER/elrond-go/cmd/node && go build -i -v -ldflags="-X main.appVersion=$(git describe --tags --long --dirty)"
 # Copy fresh node binary to $default_node_folder[i]:
 for i in "${!USE_KEYS[@]}"; do
-	cp $ELROND_FOLDER/elrond-go/cmd/node/node ${default_node_folder[i]}
+	cp -f $ELROND_FOLDER/elrond-go/cmd/node/node ${default_node_folder[i]}
 done
 
 # Build key generator:
@@ -302,7 +302,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	keepstats_keys_string_new=$(echo "$keepstats_keys_string_new no" | sed -e 's/^[ \t]*//')	# default is no
 
 	# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml
-	cp $ELROND_FOLDER/elrond-config/*.* $default_new_node_folder/config
+	cp -f $ELROND_FOLDER/elrond-config/*.* $default_new_node_folder/config
 	i=$((number_of_existing_nodes + new_node))
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
 	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' \
@@ -310,7 +310,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	fi
 
 	# Copy fresh node binary to $default_new_node_folder:
-	cp $ELROND_FOLDER/elrond-go/cmd/node/node $default_new_node_folder
+	cp -f $ELROND_FOLDER/elrond-go/cmd/node/node $default_new_node_folder
 done
 
 # Modify ./nodes_config.sh to include new node identities:
