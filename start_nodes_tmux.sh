@@ -20,7 +20,11 @@ for i in "${!USE_KEYS[@]}"; do
 	# For a single node, this will be: tmux a -t node-01
 	# To detach from that session again: <Ctrl+b>, followed by <d>
 	session_name="$SESSION_PREFIX$suffix"
-	tmux new-session -d -s "$session_name"
+	if [ -z "$(tmux ls | grep $session_name)" ]; then
+		tmux new-session -d -s "$session_name"
+	else
+		tmux send-keys -t "$session_name" C-c
+	fi
 
         # Don't use the rest-api-port by default
 	# tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
