@@ -37,6 +37,7 @@ for i in "${!USE_KEYS[@]}"; do
                 sudo systemctl enable elrond-$suffix.service
         fi
         sudo systemctl restart elrond-$suffix.service
+        sleep 1
         systemd_status+="${PURPLE}elrond-$suffix.service :${NC}\n$(sudo systemctl status elrond-$suffix.service | grep -A1 Loaded)\n"
         sudo chown -R $USER:$USER $NODE_FOLDER_PREFIX${USE_KEYS[i]}
 done
