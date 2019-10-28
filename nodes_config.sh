@@ -48,8 +48,9 @@ NODE_NAMES=('your_name (1)' 'your_name (2)' 'your_name (3)')
 # and these new pem key files will also be backed up in the $BACKUP_ALLKEYS_FOLDER.
 # If the keys in $USE_KEYS are not found in the $BACKUP_ALLKEYS_FOLDER, then they will be searched
 # in the existing node folders and copied to $BACKUP_ALLKEYS_FOLDER if necessary.
-# The $KEEP..._KEYS arrays are parallel arrays, meaning their index corresponds with $USE_KEYS
+# The $..._KEYS arrays are parallel arrays, meaning their index corresponds with $USE_KEYS
 USE_KEYS=(initNodes1Pk initNodes2Pk initNodes3Pk)	# array with first 12 chars of initialNodesPk's to be used
+RESTAPI_KEYS=(yes yes yes)				# open REST-API ports 8080, 8081,...? (default: yes)
 KEEPDB_KEYS=(yes yes yes)				# keep existing /db folders? (for new testnet launch: no)
 KEEPLOGS_KEYS=(no no no)				# keep existing /logs folders? (default: no)
 KEEPSTATS_KEYS=(no no no)				# keep existing /stats folders? (default: no)

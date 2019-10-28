@@ -38,7 +38,8 @@ You can use this repo for different scenarios:
 Here is how you could setup your `nodes_config.sh` in these scenario's, prior to running `install_nodes.sh`. 
 **Always carefully review all the settings below `!!! EDIT BELOW WHERE NECESSARY !!!`.**
 
-1. Set `USE_KEYS=()`, `KEEPDB_KEYS=()`, `KEEPLOGS_KEYS=()`, `KEEPSTATS_KEYS=()`.
+1. Set `USE_KEYS=()`. For clarity, it's best to also do `RESTAPI_KEYS=()`, `KEEPDB_KEYS=()`, `KEEPLOGS_KEYS=()`,
+`KEEPSTATS_KEYS=()`.
 
 2. You will probably have registered the initialNodesPk and the initialBalancesPk. Suppose you had two nodes
 for which the first 12 characters (key-id's) in initialNodesPk were 86001ab0d380 and 22a5a948582d. Then you set
@@ -65,5 +66,9 @@ Also, `nodes_config.sh` will be automatically updated to the new configuration.
 
 ### Running the nodes
 
-You can choose to run all node instances using `tmux` or `screen` as a terminal multiplexer.
 Use `bash start_nodes_tmux.sh` or `bash start_nodes_screen.sh` for this, respectively.
+You can choose to run all node instances using `tmux` or `screen` as a terminal multiplexer.
+
+NOTE: The `RESTAPI_KEYS` setting will be `yes` by default. The first node will use REST-API port 8080,
+the second node 8081, and so on. However, this will make your nodes vulnerable if you don't close these
+REST-API ports with `ufw`, otherwise someone could remotely do REST-API calls to your nodes!

@@ -26,9 +26,12 @@ for i in "${!USE_KEYS[@]}"; do
 		tmux send-keys -t "$session_name" C-c
 	fi
 
-        # Don't use the rest-api-port by default
-	# tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
-	tmux send -t "$session_name" "./node" ENTER
+	# Don't use the rest-api-port by default
+	if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then
+		tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
+	else
+		tmux send -t "$session_name" "./node" ENTER
+	fi
 done
 
 echo
