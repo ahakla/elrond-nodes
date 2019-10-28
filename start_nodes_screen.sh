@@ -21,9 +21,12 @@ for i in "${!USE_KEYS[@]}"; do
 	# To detach from that session again: <Ctrl+a>, followed by <d>
 	session_name="$SESSION_PREFIX$suffix"
 
-	# Don't use the rest-api-port by default
-	# screen -A -m -d -S $session_name ./node --rest-api-port $rest_api_port
-	screen -A -m -d -S $session_name ./node
+        # Don't use the rest-api-port by default
+        if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then
+		screen -A -m -d -S $session_name ./node --rest-api-port $rest_api_port
+        else
+                screen -A -m -d -S $session_name ./node
+        fi
 done
 
 echo
