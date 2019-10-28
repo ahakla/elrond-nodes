@@ -236,12 +236,12 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 	keeplogs_keys_string_new=$(echo "$keeplogs_keys_string_new no" | sed -e 's/^[ \t]*//')		# default is no
 	keepstats_keys_string_new=$(echo "$keepstats_keys_string_new no" | sed -e 's/^[ \t]*//')	# default is no
 
-	# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml
+	# Copy fresh elrond-config to the node config folder and insert friendly node names in prefs.toml
 	cp $ELROND_FOLDER/elrond-config/*.* $default_new_node_folder/config
 	i=$((number_of_existing_nodes + new_node))
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
 	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' \
-		$default_new_node_folder/config/config.toml
+		$default_new_node_folder/config/prefs.toml
 	fi
 
 	# Copy fresh node binary to $default_new_node_folder:
@@ -337,11 +337,11 @@ for i in "${!USE_KEYS[@]}"; do
 done
 
 for i in "${!USE_KEYS[@]}"; do
-	# Copy fresh elrond-config to the node config folder and insert friendly node names in config.toml:
+	# Copy fresh elrond-config to the node config folder and insert friendly node names in prefs.toml:
 	cp -f $ELROND_FOLDER/elrond-config/*.* ${default_node_folder[i]}/config
 
 	if [ ! "${NODE_NAMES[i]}" == "" ]; then
-	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' ${default_node_folder[i]}/config/config.toml
+	    sed -i 's|NodeDisplayName = ""|NodeDisplayName = "'"${NODE_NAMES[i]}"'"|g' ${default_node_folder[i]}/config/prefs.toml
 	fi
 
 
