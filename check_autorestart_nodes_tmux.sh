@@ -54,6 +54,7 @@ while [ "x$keypress" = "x" ]; do
 		else
 			echo "The REST-api port for node $i has not been opened. Will not check node status."
 			echo "Set RESTAPI_KEYS to yes to enable check and autorestart for your node."
+			if [ -t 0 ]; then stty "$SAVED_STTY"; fi
 			exit
 		fi
 	done
