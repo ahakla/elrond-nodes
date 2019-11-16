@@ -9,20 +9,102 @@ set -e
 # Source the general node config file, which should be in the same folder as the current script:
 source ./nodes_config.sh
 
+# Define criteria to restart of even reinstall node(s)
+SLEEP_SECS=20					# check every ... seconds
+MIN_ERD_NUM_CONNECTED_PEERS_T1_SECS=60		# check erd_num_connected_peers after T1 seconds
+MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T1=5		# minimum erd_num_connected_peers after T1 seconds
+
+# The lines below are for later....
+#MIN_ERD_NUM_CONNECTED_PEERS_T2_SECS=120		# check erd_num_connected_peers after T2 seconds
+#MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T2=10		# minimum erd_num_connected_peers after T2 seconds
+#MIN_ERD_NUM_CONNECTED_PEERS_MAX_TRIES=3		# reinstall node after ... restart attempts
+
+# Info message
+printf "\n${CYAN}Press q to stop this script, press i for node uptime info.${NC}\n"
+
+# Enable exiting script with a single keystroke
 if [ -t 0 ]; then
   SAVED_STTY="`stty --save`"
   stty -echo -icanon -icrnl time 0 min 0
 fi
 
-SLEEP_SECS=20		# check every 20 seconds
+# Define functions
+exit_script () {
+	# Reset keyboard input configuration to initial settings
+	if [ -t 0 ]; then stty "$SAVED_STTY"; fi
+	exit
+}
 
+initialize_clock () {
+	local node_index="$1"
+        begin[node_index]=$(date +%s)
+        diff[node_index]=0
+}
+
+check_erd_num_connected_peers () {
+	local node_index="$1"
+	local test_value="$2"
+	if [[ ${diff[node_index]} -ge $MIN_ERD_NUM_CONNECTED_PEERS_T1_SECS && $test_value -lt $MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T1 ]]; then
+		local message="after at least $MIN_ERD_NUM_CONNECTED_PEERS_T1_SECS seconds, erd_num_connected_peers < $MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T1"
+		restart $node_index "$message"
+	fi
+}
+
+restart () {
+	local node_index="$1"
+	local message="$2"
+	printf "${RED}Restarting node $((node_index+1))/$list_node_length: $message${NC}\n"
+
+        default_node_folder[node_index]="$NODE_FOLDER_PREFIX${USE_KEYS[node_index]}"  # default node folder for $USE_KEYS[i]
+	if [[ ! -d ${default_node_folder[node_index]} ]]; then
+		printf "${RED}Cannot find default node folder: ${default_node_folder[node_index]}! Exiting script.${NC}\n"
+		exit_script
+	fi
+
+        suffix="$(printf "%02d" $((node_index+1)))"
+        rest_api_port=$((8080+node_index))
+        session_name="$SESSION_PREFIX$suffix"
+
+        if [ -z "$(tmux ls | grep $session_name)" ]; then
+		printf "${RED}Cannot find tmux session $session_name! Exiting script.${NC}\n"
+		exit_script
+        else
+                tmux send-keys -t "$session_name" C-c
+		local rest_api_port_process="$(sudo lsof -t -i:$rest_api_port)"
+		if [[ ! -z "$rest_api_port_process" ]]; then sudo kill -9 "$rest_api_port_process"; fi
+		tmux kill-session -t "$session_name" && tmux new-session -d -s "$session_name"
+        fi
+
+        # Use rest-api-port by default
+	tmux send -t "$session_name" "cd ${default_node_folder[node_index]}" ENTER
+        tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
+
+	# Initialize clock for the restarted node
+	initialize_clock $node_index
+}
+
+show_info () {
+	echo
+	for i in $list_node_index; do
+		mins[i]=$((${diff[i]} / 60))
+		secs[i]=$((${diff[i]} % 60))
+		hours[i]=$((${diff[i]} / 3600))
+		days[i]=$((${diff[i]} / 86400))
+		printf "${CYAN}Node %d/%d has run for %d days, %02d:%02d:%02d\n${NC}" $((i+1)) $list_node_length ${days[i]} ${hours[i]} ${mins[i]} ${secs[i]}
+	done
+}
+
+# Initialization
 list_node_index="${!USE_KEYS[@]}"
 list_node_length="${#USE_KEYS[@]}"
-begin=$(date +%s)
+for i in $list_node_index; do
+	initialize_clock $i
+done
 keypress=''
-while [ "x$keypress" = "x" ]; do
-	echo
-	echo " Node | Sync | initNodes Pk | Typ | Node Display Name | Shard | ConP | Synch Block Nonce | Consensus Round"
+
+# Start monitoring
+while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
+	printf "\n${GREEN} Node ${NC}|${GREEN} Sync ${NC}|${GREEN} initNodes Pk ${NC}|${GREEN} Typ ${NC}|${GREEN} Node Display Name ${NC}|${GREEN} Shard ${NC}|${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}\n"
 	for i in $list_node_index; do
 	        rest_api_port=$((8080+i))
 		node_status[i]="$(curl --silent http://localhost:$rest_api_port/node/status)"
@@ -43,19 +125,18 @@ while [ "x$keypress" = "x" ]; do
 				erd_probable_highest_nonce[i]="$(echo ${node_status[i]} | jq '.details.erd_probable_highest_nonce')"
 				erd_synchronized_round[i]="$(echo ${node_status[i]} | jq '.details.erd_synchronized_round')"
 				erd_current_round[i]="$(echo ${node_status[i]} | jq '.details.erd_current_round')"
-				printf "%2d/%-2d |  %2s  | %-12s | %-3s | %-17s | %5s | %4d | %8d/%-8d | %8d/%-8d \n" \
+				printf "%2d/%-2d |  %2s  | %-12s | %-3s | %-17s | %5s | %4d | %8d/%-8d | %8d/%-8d\n" \
 					$((i+1)) $list_node_length "${erd_is_syncing_str[i]}" "${erd_public_key_block_sign[i]:0:12}" "${erd_node_type[i]:0:3}" "${erd_node_display_name[i]:0:17}" "${erd_shard_id[i]}" \
 					"${erd_num_connected_peers[i]}" "${erd_nonce[i]}" "${erd_probable_highest_nonce[i]}" \
 					"${erd_synchronized_round[i]}" "${erd_current_round[i]}"
+
+				check_erd_num_connected_peers $i "${erd_num_connected_peers[i]}"
+
 			else
-				printf "Node %d/%d down!\n" \
-					$((i+1)) $list_node_length
+				printf "${RED}Node %d/%d down!${NC}\n" $((i+1)) $list_node_length
 			fi
 		else
-			echo "The REST-api port for node $i has not been opened. Will not check node status."
-			echo "Set RESTAPI_KEYS to yes to enable check and autorestart for your node."
-			if [ -t 0 ]; then stty "$SAVED_STTY"; fi
-			exit
+			printf "${RED}The REST-api port for node %d/%d has not been opened. Cannot monitor node.${NC}\n" $((i+1)) $list_node_length
 		fi
 	done
 
@@ -64,18 +145,16 @@ while [ "x$keypress" = "x" ]; do
 		sleep 1
 
 		now=$(date +%s)
-		diff=$(($now - $begin))
-		mins=$(($diff / 60))
-		secs=$(($diff % 60))
-		hours=$(($diff / 3600))
-		days=$(($diff / 86400))
-		if [ "x$keypress" != "x" ]; then
+		for i in $list_node_index; do diff[i]=$(($now - ${begin[i]})); done
+		if [[ "x$keypress" == "xq" || "x$keypress" == "xQ" ]]; then
 			break
+		fi
+		if [[ "x$keypress" == "xi" || "x$keypress" == "xI" ]]; then
+			show_info
 		fi
 	done
 done
 
-if [ -t 0 ]; then stty "$SAVED_STTY"; fi
-
-printf "\nYou pressed %s after %d Days, %02d:%02d:%02d\n" $keypress $days $hours $mins $secs
-exit 0
+# Message upon exit
+show_info
+exit_script
