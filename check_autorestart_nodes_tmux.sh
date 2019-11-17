@@ -44,7 +44,8 @@ initialize_clock () {
 check_node_process () {
 	local node_index="$1"
         local rest_api_port=$((8080+node_index))
-	local rest_api_port_node_process="$(sudo lsof -t -i:$rest_api_port -c node -a)"
+	# Don't exit the script if lsof fails, this is an exception
+	set +e && local rest_api_port_node_process="$(sudo lsof -t -i:$rest_api_port -c node -a)" && set -e
 
 	if [[ -z "$rest_api_port_node_process" ]]; then
 		local message="cannot find node process on rest-api port $rest_api_port"
@@ -81,8 +82,9 @@ restart () {
 		exit_script
         else
                 tmux send-keys -t "$session_name" C-c
-		local rest_api_port_process="$(sudo lsof -t -i:$rest_api_port)"
-		if [[ ! -z "$rest_api_port_process" ]]; then sudo kill -9 "$rest_api_port_process"; fi
+		# Don't exit the script if lsof fails, this is an exception
+		set +e && local rest_api_port_node_process="$(sudo lsof -t -i:$rest_api_port -c node -a)" && set -e
+		if [[ ! -z "$rest_api_port_node_process" ]]; then sudo kill "$rest_api_port_node_process"; fi
 		tmux kill-session -t "$session_name" && tmux new-session -d -s "$session_name"
         fi
 
