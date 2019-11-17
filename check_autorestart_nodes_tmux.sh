@@ -86,10 +86,10 @@ restart () {
 show_info () {
 	echo
 	for i in $list_node_index; do
-		mins[i]=$((${diff[i]} / 60))
 		secs[i]=$((${diff[i]} % 60))
-		hours[i]=$((${diff[i]} / 3600))
-		days[i]=$((${diff[i]} / 86400))
+		mins[i]=$((${diff[i]} / 60 % 60))
+		hours[i]=$((${diff[i]} / 60 / 60 % 24))
+		days[i]=$((${diff[i]} / 60 / 60 / 24))
 		printf "${CYAN}Node %d/%d has run for %d days, %02d:%02d:%02d\n${NC}" $((i+1)) $list_node_length ${days[i]} ${hours[i]} ${mins[i]} ${secs[i]}
 	done
 }
