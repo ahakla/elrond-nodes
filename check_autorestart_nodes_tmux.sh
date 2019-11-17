@@ -19,6 +19,21 @@ MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T1=5		# minimum erd_num_connected_peers after 
 #MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T2=10		# minimum erd_num_connected_peers after T2 seconds
 #MIN_ERD_NUM_CONNECTED_PEERS_MAX_TRIES=3		# reinstall node after ... restart attempts
 
+# Initialization
+use_rest_api=0
+list_node_index="${!USE_KEYS[@]}"
+list_node_length="${#USE_KEYS[@]}"
+for i in $list_node_index; do if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then use_rest_api=1; fi; done
+
+# If use of REST-API is not enabled, do not monitor nodes and exit monitoring script
+if [ "$use_rest_api" -eq "0" ]; then
+	printf "${RED}In nodes_config.sh, RESTAPI_KEYS was set to \'no\' for all $list_node_length nodes!${NC}\n"
+	printf "${RED}Node monitoring is therefore not available for your nodes. Exiting monitoring script.${NC}\n"
+	exit
+fi
+
+keypress=''
+
 # Info message
 printf "\n${CYAN}This monitoring script will check the nodes' statuses every $SLEEP_SECS seconds.${NC}"
 printf "\n${CYAN}Press q to stop this script, press i for node uptime info.${NC}\n"
@@ -104,20 +119,19 @@ show_info () {
 		mins[i]=$((${diff[i]} / 60 % 60))
 		hours[i]=$((${diff[i]} / 60 / 60 % 24))
 		days[i]=$((${diff[i]} / 60 / 60 / 24))
-		printf "${CYAN}Node %d/%d has run for %d days, %02d:%02d:%02d\n${NC}" $((i+1)) $list_node_length ${days[i]} ${hours[i]} ${mins[i]} ${secs[i]}
+		if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then
+			printf "${CYAN}Node %d/%d has run for %d days, %02d:%02d:%02d\n${NC}" $((i+1)) $list_node_length \
+				${days[i]} ${hours[i]} ${mins[i]} ${secs[i]}
+		fi
 	done
 }
 
-# Initialization
-list_node_index="${!USE_KEYS[@]}"
-list_node_length="${#USE_KEYS[@]}"
-for i in $list_node_index; do
-	initialize_clock $i
-done
-keypress=''
+# Initialize clocks for all nodes
+for i in $list_node_index; do initialize_clock $i; done
 
 # Start monitoring
 while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
+	header_printed=0
 	for i in $list_node_index; do
 
 	        # Check if rest-api-port is open
@@ -130,10 +144,11 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 			if [[ ! -z $(echo ${node_status[i]} | jq '.details.erd_app_version') ]]; then
 
 				# Only printf header once
-				if [ "$i" -eq "0" ]; then
+				if [ "$header_printed" -eq "0" ]; then
 					printf "\n${GREEN} Node ${NC}|${GREEN} Sync ${NC}|${GREEN} initNodes Pk ${NC}|"
 					printf "${GREEN} Typ ${NC}|${GREEN} Node Display Name ${NC}|${GREEN} Shard ${NC}|"
-					printf "${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}\n"
+					printf "${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}"
+					header_printed=1
 				fi
 
 				erd_is_syncing_str[i]="OK"
@@ -149,17 +164,20 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 				erd_probable_highest_nonce[i]="$(echo ${node_status[i]} | jq '.details.erd_probable_highest_nonce')"
 				erd_synchronized_round[i]="$(echo ${node_status[i]} | jq '.details.erd_synchronized_round')"
 				erd_current_round[i]="$(echo ${node_status[i]} | jq '.details.erd_current_round')"
-				printf "%2d/%-2d |  %2s  | %-12s | %-3s | %-17s | %5s | %4d | %8d/%-8d | %8d/%-8d\n" \
-					$((i+1)) $list_node_length "${erd_is_syncing_str[i]}" "${erd_public_key_block_sign[i]:0:12}" "${erd_node_type[i]:0:3}" "${erd_node_display_name[i]:0:17}" "${erd_shard_id[i]}" \
+				printf "\n%2d/%-2d |  %2s  | %-12s | %-3s | %-17s | %5s | %4d | %8d/%-8d | %8d/%-8d" \
+					$((i+1)) $list_node_length "${erd_is_syncing_str[i]}" "${erd_public_key_block_sign[i]:0:12}" \
+					"${erd_node_type[i]:0:3}" "${erd_node_display_name[i]:0:17}" "${erd_shard_id[i]}" \
 					"${erd_num_connected_peers[i]}" "${erd_nonce[i]}" "${erd_probable_highest_nonce[i]}" \
 					"${erd_synchronized_round[i]}" "${erd_current_round[i]}"
 
 				check_erd_num_connected_peers $i "${erd_num_connected_peers[i]}"
 			fi
 		else
-			printf "${RED}The REST-api port for node %d/%d has not been opened. Cannot monitor node.${NC}\n" $((i+1)) $list_node_length
+			printf "\n${RED}RESTAPI_KEYS for node %d/%d was set to \'no\'. Node monitoring not available for this node.${NC}" \
+				$((i+1)) $list_node_length
 		fi
 	done
+	echo
 
 	for count in $(seq 1 $SLEEP_SECS); do
 		keypress="`cat -v`"
