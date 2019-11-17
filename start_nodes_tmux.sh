@@ -3,7 +3,7 @@
 # This script will run all $NUMBER_OF_NODES nodes in tmux sessions.
 
 # Exit script immediately on error:
-set -e -x
+set -e
 
 # Source the general node config file, which should be in the same folder as the current script:
 source ./nodes_config.sh
