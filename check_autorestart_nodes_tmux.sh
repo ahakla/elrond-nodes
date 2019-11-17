@@ -41,6 +41,17 @@ initialize_clock () {
         diff[node_index]=0
 }
 
+check_node_process () {
+	local node_index="$1"
+        local rest_api_port=$((8080+node_index))
+	local rest_api_port_node_process="$(sudo lsof -t -i:$rest_api_port -c node -a)"
+
+	if [[ -z "$rest_api_port_node_process" ]]; then
+		local message="cannot find node process on rest-api port $rest_api_port"
+		restart $node_index "$message"
+	fi
+}
+
 check_erd_num_connected_peers () {
 	local node_index="$1"
 	local test_value="$2"
@@ -106,11 +117,16 @@ keypress=''
 while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 	printf "\n${GREEN} Node ${NC}|${GREEN} Sync ${NC}|${GREEN} initNodes Pk ${NC}|${GREEN} Typ ${NC}|${GREEN} Node Display Name ${NC}|${GREEN} Shard ${NC}|${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}\n"
 	for i in $list_node_index; do
-	        rest_api_port=$((8080+i))
-		node_status[i]="$(curl --silent http://localhost:$rest_api_port/node/status)"
 
 	        # Check if rest-api-port is open
 	        if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then
+
+			check_node_process $i
+
+		        rest_api_port=$((8080+i))
+			# Don't exit the script if curl fails, this is an exception
+			set +e && node_status[i]="$(curl --silent http://localhost:$rest_api_port/node/status)" && set -e
+
 			if [[ ! -z $(echo ${node_status[i]} | jq '.details.erd_app_version') ]]; then
 				erd_is_syncing_str[i]="OK"
 				erd_is_syncing[i]="$(echo ${node_status[i]} | jq '.details.erd_is_syncing')"
@@ -131,9 +147,6 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 					"${erd_synchronized_round[i]}" "${erd_current_round[i]}"
 
 				check_erd_num_connected_peers $i "${erd_num_connected_peers[i]}"
-
-			else
-				printf "${RED}Node %d/%d down!${NC}\n" $((i+1)) $list_node_length
 			fi
 		else
 			printf "${RED}The REST-api port for node %d/%d has not been opened. Cannot monitor node.${NC}\n" $((i+1)) $list_node_length
