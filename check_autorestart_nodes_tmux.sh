@@ -123,8 +123,6 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 	        # Check if rest-api-port is open
 	        if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then
 
-			check_node_process $i
-
 		        rest_api_port=$((8080+i))
 			# Don't exit the script if curl fails, this is an exception
 			set +e && node_status[i]="$(curl --silent http://localhost:$rest_api_port/node/status)" && set -e
@@ -168,6 +166,9 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 			show_info
 		fi
 	done
+
+	# Check node process only after the first sleep
+	check_node_process $i
 done
 
 # Message upon exit
