@@ -130,7 +130,7 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 			if [[ ! -z $(echo ${node_status[i]} | jq '.details.erd_app_version') ]]; then
 
 				# Only printf header once
-				if [ "$i" -eq "0"]; then
+				if [ "$i" -eq "0" ]; then
 					printf "\n${GREEN} Node ${NC}|${GREEN} Sync ${NC}|${GREEN} initNodes Pk ${NC}|"
 					printf "${GREEN} Typ ${NC}|${GREEN} Node Display Name ${NC}|${GREEN} Shard ${NC}|"
 					printf "${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}\n"
