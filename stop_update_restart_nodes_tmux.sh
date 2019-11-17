@@ -156,7 +156,7 @@ echo -e
 sudo apt update && sudo apt dist-upgrade -y
 
 # Install some dependencies:
-sudo apt install -y git curl screen tmux
+sudo apt install -y git curl screen tmux jq
 
 # Check if go is already installed:
 if ! [ -x "$(command -v go)" ];
