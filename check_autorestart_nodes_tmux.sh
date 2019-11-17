@@ -20,6 +20,7 @@ MIN_ERD_NUM_CONNECTED_PEERS_AFTER_T1=5		# minimum erd_num_connected_peers after 
 #MIN_ERD_NUM_CONNECTED_PEERS_MAX_TRIES=3		# reinstall node after ... restart attempts
 
 # Info message
+printf "\n${CYAN}This monitoring script will check the nodes' statuses every $SLEEP_SECS seconds.${NC}"
 printf "\n${CYAN}Press q to stop this script, press i for node uptime info.${NC}\n"
 
 # Enable exiting script with a single keystroke
@@ -117,7 +118,6 @@ keypress=''
 
 # Start monitoring
 while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
-	printf "\n${GREEN} Node ${NC}|${GREEN} Sync ${NC}|${GREEN} initNodes Pk ${NC}|${GREEN} Typ ${NC}|${GREEN} Node Display Name ${NC}|${GREEN} Shard ${NC}|${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}\n"
 	for i in $list_node_index; do
 
 	        # Check if rest-api-port is open
@@ -128,6 +128,14 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 			set +e && node_status[i]="$(curl --silent http://localhost:$rest_api_port/node/status)" && set -e
 
 			if [[ ! -z $(echo ${node_status[i]} | jq '.details.erd_app_version') ]]; then
+
+				# Only printf header once
+				if [ "$i" -eq "0"]; then
+					printf "\n${GREEN} Node ${NC}|${GREEN} Sync ${NC}|${GREEN} initNodes Pk ${NC}|"
+					printf "${GREEN} Typ ${NC}|${GREEN} Node Display Name ${NC}|${GREEN} Shard ${NC}|"
+					printf "${GREEN} ConP ${NC}|${GREEN} Synch Block Nonce ${NC}|${GREEN} Consensus Round${NC}\n"
+				fi
+
 				erd_is_syncing_str[i]="OK"
 				erd_is_syncing[i]="$(echo ${node_status[i]} | jq '.details.erd_is_syncing')"
 				if [[ $((erd_is_syncing[i])) != 0 ]]; then erd_is_syncing_str[i]="!!"; fi
