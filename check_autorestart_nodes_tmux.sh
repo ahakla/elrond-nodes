@@ -94,8 +94,7 @@ restart () {
         session_name="$SESSION_PREFIX$suffix"
 
         if [ -z "$(tmux ls | grep $session_name)" ]; then
-		printf "${RED}Cannot find tmux session $session_name! Exiting script.${NC}\n"
-		exit_script
+                tmux new-session -d -s "$session_name"
         else
                 tmux send-keys -t "$session_name" C-c
 		# Don't exit the script if lsof fails, this is an exception
