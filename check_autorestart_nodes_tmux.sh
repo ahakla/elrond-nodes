@@ -194,7 +194,9 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 	done
 
 	# Check node process only after the first sleep
-	check_node_process $i
+        for i in $list_node_index; do
+		check_node_process $i
+	done
 done
 
 # Message upon exit
