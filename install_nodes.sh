@@ -6,8 +6,8 @@
 set -e
 
 # Source the general node config file, which should be in the same folder as the current script:
-source ./nodes_config.sh
-scripts_folder=$PWD
+scripts_folder=$(dirname "$(realpath $0)")
+source $scripts_folder/nodes_config.sh
 
 # First check if the user has stopped all their nodes:
 stopped_nodes_answer=""		# initialize as empty
@@ -208,7 +208,7 @@ echo -e
 sudo apt update && sudo apt dist-upgrade -y
 
 # Install some dependencies:
-sudo apt install -y git curl screen tmux jq
+sudo apt install -y git curl tmux jq
 
 # Check if go is already installed:
 if ! [ -x "$(command -v go)" ];

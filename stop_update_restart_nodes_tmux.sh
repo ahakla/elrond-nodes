@@ -156,7 +156,7 @@ echo -e
 sudo apt update && sudo apt dist-upgrade -y
 
 # Install some dependencies:
-sudo apt install -y git curl screen tmux jq
+sudo apt install -y git curl tmux jq
 
 # Check if go is already installed:
 if ! [ -x "$(command -v go)" ];
@@ -268,6 +268,9 @@ for i in "${!USE_KEYS[@]}"; do
 	echo -e "Searching required folders for initialNodesPk ${CYAN}${USE_KEYS[i]}...${NC}"
 	for folder in $folders_with_keys; do
 
+	    # Check if the folder hasn't been deleted during the cleanup!
+	    if [[ -f "$folder/initialNodesSk.pem" ]]; then
+
 		# Search for matching initialNodesPk's in each folder that contains both pem key files:
 		contents_initialNodesSk=$(<"$folder/initialNodesSk.pem")
 		if [[ "${USE_KEYS[i]}" == "${contents_initialNodesSk:27:12}" ]]; then
@@ -333,6 +336,7 @@ for i in "${!USE_KEYS[@]}"; do
 				fi
 			fi
 		fi
+	    fi
 	done
 done
 
@@ -350,5 +354,4 @@ for i in "${!USE_KEYS[@]}"; do
 done
 
 # Restart the nodes
-cd $scripts_folder
-bash start_nodes_tmux.sh
+bash $scripts_folder/start_nodes_tmux.sh
