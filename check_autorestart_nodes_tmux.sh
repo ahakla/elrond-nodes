@@ -7,7 +7,8 @@
 set -e
 
 # Source the general node config file, which should be in the same folder as the current script:
-source ./nodes_config.sh
+scripts_folder=$(dirname "$(realpath $0)")
+source $scripts_folder/nodes_config.sh
 
 # Define criteria to restart of even reinstall node(s)
 SLEEP_SECS=20					# check every ... seconds
@@ -91,7 +92,12 @@ restart () {
 
         suffix="$(printf "%02d" $((node_index+1)))"
         rest_api_port=$((8080+node_index))
-        session_name="$SESSION_PREFIX$suffix"
+
+        # Run node in virtual tmux session: $session_name.
+        # The user can switch to this session with: tmux a -t $session_name
+        # For a single node, this will be: tmux a -t node-01
+        # To detach from that session again: <Ctrl+b>, followed by <d>
+	session_name="$SESSION_PREFIX$suffix"
 
         if [ -z "$(tmux ls | grep $session_name)" ]; then
                 tmux new-session -d -s "$session_name"

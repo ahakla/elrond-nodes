@@ -7,8 +7,8 @@
 set -e
 
 # Source the general node config file, which should be in the same folder as the current script:
-source ./nodes_config.sh
-scripts_folder=$PWD
+scripts_folder=$(dirname "$(realpath $0)")
+source $scripts_folder/nodes_config.sh
 
 # Create $ELROND_FOLDER and $BACKUP_ALLKEYS_FOLDER if they do not exist:
 mkdir -p $ELROND_FOLDER $BACKUP_ALLKEYS_FOLDER

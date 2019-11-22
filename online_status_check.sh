@@ -1,14 +1,14 @@
 #/bin/bash
 
 # EXAMPLE:
-# bash monitor_nodes.sh -w			--> shows all offline validator nodes
-# bash monitor_nodes.sh string1 string2 string3	--> shows all nodes with string in their json info
+# bash online_status_check.sh -w			--> shows all offline validator nodes
+# bash online_status_check.sh string1 string2 string3	--> shows all nodes with string in their json info
 
 # User needs to specify at least 1 search term as an argument (case sensitive)
 if [ "$#" == 0 ]; then
 	echo
 	echo "Please specify at least 1 search term, like part of the node display name or initialNodesPk."
-	echo "bash monitor_nodes.sh -w	--> Show all offline validator nodes"
+	echo "bash online_status_check.sh -w	--> Show all offline validator nodes"
 	echo "Exiting script."
 	echo
 	exit

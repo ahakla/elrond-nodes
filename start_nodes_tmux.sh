@@ -6,13 +6,16 @@
 set -e
 
 # Source the general node config file, which should be in the same folder as the current script:
-source ./nodes_config.sh
-scripts_folder=$PWD
+scripts_folder=$(dirname "$(realpath $0)")
+source $scripts_folder/nodes_config.sh
 use_rest_api=0	# initialize at zero
 
 for i in "${!USE_KEYS[@]}"; do
-	default_node_folder[i]="$NODE_FOLDER_PREFIX${USE_KEYS[i]}"  # default node folder for $USE_KEYS[i]
-	cd ${default_node_folder[i]}
+        default_node_folder[i]="$NODE_FOLDER_PREFIX${USE_KEYS[i]}"  # default node folder for $USE_KEYS[i]
+        if [[ ! -d ${default_node_folder[i]} ]]; then
+                printf "${RED}Cannot find default node folder: ${default_node_folder[i]}! Exiting script.${NC}\n"
+                exit
+        fi
 
 	suffix="$(printf "%02d" $((i+1)))"
 	rest_api_port=$((8080+i))
@@ -34,6 +37,7 @@ for i in "${!USE_KEYS[@]}"; do
                 tmux kill-session -t "$session_name" && tmux new-session -d -s "$session_name"
         fi
 
+	tmux send -t "$session_name" "cd ${default_node_folder[i]}" ENTER
 	# Only use the REST-API port explicitly
 	if [ "${RESTAPI_KEYS[i]^^}" = "YES" ]; then
 		use_rest_api=1
@@ -56,8 +60,7 @@ if [ "$use_rest_api" -eq "1" ]; then
                 tmux kill-session -t "$monitor_session_name" && tmux new-session -d -s "$monitor_session_name"
         fi
 
-        tmux send -t "$monitor_session_name" "cd $scripts_folder" ENTER
-        tmux send -t "$monitor_session_name" "bash check_autorestart_nodes_tmux.sh" ENTER
+        tmux send -t "$monitor_session_name" "bash $scripts_folder/check_autorestart_nodes_tmux.sh" ENTER
 fi
 
 echo
