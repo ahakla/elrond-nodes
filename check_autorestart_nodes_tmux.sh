@@ -163,8 +163,8 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 				erd_probable_highest_nonce[i]="$(echo ${node_status[i]} | jq '.details.erd_probable_highest_nonce')"
 				erd_synchronized_round[i]="$(echo ${node_status[i]} | jq '.details.erd_synchronized_round')"
 				erd_current_round[i]="$(echo ${node_status[i]} | jq '.details.erd_current_round')"
-				printf "\n%2d/%-2d |  %2s  | %-12s | %-3s | %-17s | %5s | %4d | %8d/%-8d | %8d/%-8d" \
-					$((i+1)) $list_node_length "${erd_is_syncing_str[i]}" "${erd_public_key_block_sign[i]:0:12}" \
+				printf "\n%2s/%-2s |  %2s  | %-12s | %-3s | %-17s | %5s | %4s | %8s/%-8s | %8s/%-8s" \
+					"$((i+1))" "$list_node_length" "${erd_is_syncing_str[i]}" "${erd_public_key_block_sign[i]:0:12}" \
 					"${erd_node_type[i]:0:3}" "${erd_node_display_name[i]:0:17}" "${erd_shard_id[i]}" \
 					"${erd_num_connected_peers[i]}" "${erd_nonce[i]}" "${erd_probable_highest_nonce[i]}" \
 					"${erd_synchronized_round[i]}" "${erd_current_round[i]}"
