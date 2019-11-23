@@ -254,12 +254,19 @@ sed -i 's/^KEEPDB_KEYS=([^)]*)/KEEPDB_KEYS=('"$keepdb_keys_string_new"')/g' $scr
 sed -i 's/^KEEPLOGS_KEYS=([^)]*)/KEEPLOGS_KEYS=('"$keeplogs_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 sed -i 's/^KEEPSTATS_KEYS=([^)]*)/KEEPSTATS_KEYS=('"$keepstats_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 
-# Stop running nodes using tmux kill-server
+# Stop running nodes and copy fresh installs to node folders
 echo
-echo -e "${CYAN}Stopping all running nodes by killing the tmux server...${NC}"
-tmux kill-server
-
 for i in "${!USE_KEYS[@]}"; do
+
+	# Kill an existing tmux session for this node, if it exists
+        suffix="$(printf "%02d" $((i+1)))"
+        session_name="$SESSION_PREFIX$suffix"
+        if [ ! -z "$(tmux ls | grep $session_name)" ]; then
+                tmux send-keys -t "$session_name" C-c
+		echo -e "${CYAN}Killing existing tmux session $session_name...${NC}"
+                tmux kill-session -t "$session_name"
+        fi
+
 	# $mainfolder_existing_node[i] is folder where pem key files for $USE_KEYS[i] are found...
 	# ...and for which all the required ../db ../logs ../stats folders exist.
 	mainfolder_existing_node[i]=""	# initialize at ""
