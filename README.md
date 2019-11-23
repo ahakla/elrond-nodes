@@ -1,6 +1,6 @@
 # elrond-nodes
 
-This repository enables you to install/update one or multiple Elrond nodes on Ubuntu 18.04.
+This repository enables you to install/update, and monitor one or multiple Elrond nodes on Ubuntu 18.04.
 For a Medium post about how to use this repository, see
 https://medium.com/@haklander/run-and-maintain-one-or-multiple-elrond-nodes-in-ubuntu-18-04-5f5c9658e580
 
@@ -12,7 +12,7 @@ Instructions for using this repository:
 (like `$HOME/elrond_backup_keys/node1` and `$HOME/elrond_backup_keys/node2`), and copy your `initialNodesSk.pem`
 and `initialBalancesSk.pem` there
 
- * `git clone https://github.com/ahakla/elrond-nodes.git` - clone this repository
+ * `cd; git clone https://github.com/ahakla/elrond-nodes.git` - clone this repository
  * `cd elrond-nodes` - open the folder with the scripts
  * `nano nodes_config.sh` - customize the nodes setup
  * stop all nodes, if they are still running (for tmux you may want to use `tmux kill-server`)
@@ -46,18 +46,18 @@ for which the first 12 characters (key-id's) in initialNodesPk were 86001ab0d380
 `NUMBER_OF_NODES=2` and `NODE_NAMES=('your_name (1)' 'your_name (2)')`, or any other friendly node names you
 would like to give your nodes. You set the array `USE_KEYS=(86001ab0d380 22a5a948582d)`, and if you want to keep
 the nodes' databases to not have to synchronize again (unless there is a new testnet), you can set the array
-`KEEPDB_KEYS=(yes yes)`, for the rest the default is `KEEPLOGS_KEYS=(no no)`, and `KEEPSTATS_KEYS=(no no)`.
+`KEEPDB_KEYS=(yes yes)`, for the rest the default is `RESTAPI_KEYS=(yes yes)`, `KEEPLOGS_KEYS=(no no)`, and `KEEPSTATS_KEYS=(no no)`.
 
-3. Same as 2, but now you set `NUMBER_OF_NODES` higher than the number of elements in the `USE_KEYS`, `KEEPDB_KEYS`,
+3. Same as 2, but now you set `NUMBER_OF_NODES` higher than the number of elements in the `USE_KEYS`, `RESTAPI_KEYS`, `KEEPDB_KEYS`,
 `KEEPLOGS_KEYS`, and `KEEPSTATS_KEYS` arrays. Make sure that `NODE_NAMES` contains `NUMBER_OF_NODES` elements.
 The `install_nodes.sh` script will create new node identities and back up their pem key files.
 Also, `nodes_config.sh` will be automatically updated to the new configuration.
 
-4. Just leave out the array entries for the key-id you don't want to use in the `USE_KEYS`, `KEEPDB_KEYS`,
+4. Just leave out the array entries for the key-id you don't want to use in the `USE_KEYS`, `RESTAPI_KEYS`, `KEEPDB_KEYS`,
 `KEEPLOGS_KEYS`, and `KEEPSTATS_KEYS` arrays. Make sure that `NODE_NAMES` contains the same number of elements
 as `USE_KEYS` and `NUMBER_OF_NODES`.
 
-5. Same as 4, but now you set `NUMBER_OF_NODES` higher than the number of elements in the `USE_KEYS`, `KEEPDB_KEYS`,
+5. Same as 4, but now you set `NUMBER_OF_NODES` higher than the number of elements in the `USE_KEYS`, `RESTAPI_KEYS`, `KEEPDB_KEYS`,
 `KEEPLOGS_KEYS`, and `KEEPSTATS_KEYS` arrays. Make sure that `NODE_NAMES` contains `NUMBER_OF_NODES` elements.
 The `install_nodes.sh` script will create new node identities and back up their pem key files.
 Also, `nodes_config.sh` will be automatically updated to the new configuration.

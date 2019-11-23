@@ -273,6 +273,7 @@ go build
 
 # Prepare for appending settings for the new nodes identities:
 use_keys_string_new="${USE_KEYS[@]}"
+restapi_keys_string_new="${RESTAPI_KEYS[@]}"
 keepdb_keys_string_new="${KEEPDB_KEYS[@]}"
 keeplogs_keys_string_new="${KEEPLOGS_KEYS[@]}"
 keepstats_keys_string_new="${KEEPSTATS_KEYS[@]}"
@@ -297,6 +298,7 @@ for new_node in $( seq 0 $((number_of_new_nodes - 1)) ); do
 
 	# Appending new node identities to settings:
 	use_keys_string_new=$(echo "$use_keys_string_new $key_id" | sed -e 's/^[ \t]*//')
+	restapi_keys_string_new=$(echo "$restapi_keys_string_new yes" | sed -e 's/^[ \t]*//')		# default is yes
 	keepdb_keys_string_new=$(echo "$keepdb_keys_string_new yes" | sed -e 's/^[ \t]*//')		# safest default is yes
 	keeplogs_keys_string_new=$(echo "$keeplogs_keys_string_new no" | sed -e 's/^[ \t]*//')		# default is no
 	keepstats_keys_string_new=$(echo "$keepstats_keys_string_new no" | sed -e 's/^[ \t]*//')	# default is no
@@ -315,6 +317,7 @@ done
 
 # Modify ./nodes_config.sh to include new node identities:
 sed -i 's/^USE_KEYS=([^)]*)/USE_KEYS=('"$use_keys_string_new"')/g' $scripts_folder/nodes_config.sh
+sed -i 's/^RESTAPI_KEYS=([^)]*)/RESTAPI_KEYS=('"$restapi_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 sed -i 's/^KEEPDB_KEYS=([^)]*)/KEEPDB_KEYS=('"$keepdb_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 sed -i 's/^KEEPLOGS_KEYS=([^)]*)/KEEPLOGS_KEYS=('"$keeplogs_keys_string_new"')/g' $scripts_folder/nodes_config.sh
 sed -i 's/^KEEPSTATS_KEYS=([^)]*)/KEEPSTATS_KEYS=('"$keepstats_keys_string_new"')/g' $scripts_folder/nodes_config.sh
