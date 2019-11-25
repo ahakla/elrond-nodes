@@ -200,7 +200,7 @@ while [[ "x$keypress" != "xq" && "x$keypress" != "xQ" ]]; do
 
 	# Check node process only after the first sleep
         for i in $list_node_index; do
-		check_node_process $i
+	        if [[ "${RESTAPI_KEYS[i]^^}" == "YES" ]]; then check_node_process $i; fi
 	done
 done
 
