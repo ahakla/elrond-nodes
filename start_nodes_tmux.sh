@@ -41,7 +41,7 @@ for i in "${!USE_KEYS[@]}"; do
 	# Only use the REST-API port explicitly
 	if [ "${RESTAPI_KEYS[i]^^}" = "YES" ]; then
 		use_rest_api=1
-		tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
+		tmux send -t "$session_name" "./node --rest-api-interface localhost:$rest_api_port" ENTER
 	else
 		tmux send -t "$session_name" "./node" ENTER
 	fi

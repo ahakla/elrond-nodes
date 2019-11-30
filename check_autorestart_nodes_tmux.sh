@@ -111,7 +111,7 @@ restart () {
 
         # Use rest-api-port by default
 	tmux send -t "$session_name" "cd ${default_node_folder[node_index]}" ENTER
-        tmux send -t "$session_name" "./node --rest-api-port $rest_api_port" ENTER
+        tmux send -t "$session_name" "./node --rest-api-interface localhost:$rest_api_port" ENTER
 
 	# Initialize clock for the restarted node
 	initialize_clock $node_index
