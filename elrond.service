@@ -1,0 +1,44 @@
+# It is not recommended to modify this file in-place, because it will
+# be overwritten during package upgrades. If you want to add further
+# options or overwrite existing ones then use
+# See 'man systemd.service' for details.
+
+[Unit]
+Description=elrond $suffix daemon
+After=network.target
+
+[Service]
+Environment=GOPATH=$GOPATH
+WorkingDirectory=${default_node_folder[i]}
+ExecStart=/bin/bash -lc './node --rest-api-port $rest_api_port --use-log-view'
+Type=simple
+Restart=on-failure
+
+# syslog
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=Elrond$suffix
+
+# Hardening measures
+####################
+
+# Provide a private /tmp and /var/tmp.
+PrivateTmp=true
+
+# Mount /usr, /boot/ and /etc read-only for the process.
+ProtectSystem=full
+
+# Disallow the process and all of its children to gain
+# new privileges through execve().
+NoNewPrivileges=true
+
+# Use a new /dev namespace only populated with API pseudo devices
+# such as /dev/null, /dev/zero and /dev/random.
+PrivateDevices=true
+
+
+# Deny the creation of writable and executable memory mappings.
+MemoryDenyWriteExecute=false
+
+[Install]
+WantedBy=multi-user.target
